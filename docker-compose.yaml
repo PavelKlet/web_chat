@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+    ports:
+      - "8000:8000"
+    command: [
+      "bash",
+      "-c",
+      "poetry run alembic upgrade head && poetry run uvicorn main:app --reload --port 8000 --host 0.0.0.0"
+    ]
+    depends_on:
+      - redis
+      - db
+  redis:
+    container_name: redis
+    image: redis:latest
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "6379:6379"
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_HOST = ${DB_HOST}
+      - POSTGRES_PORT = ${DB_PORT}
+    volumes:
+      - ./data/db:/var/lib/postgresql/data

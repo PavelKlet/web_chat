@@ -1,0 +1,15 @@
+*.pyc
+*.pyo
+
+.idea/
+.DS_Store
+/.Python
+
+*.lock
+../app/.env
+dumps/
+*.log
+media/
+.vscode/settings.json
+.env
+*data

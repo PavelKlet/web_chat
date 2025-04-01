@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/static/css/login-styles.css"
+    />
+    <title>Вход</title>
+  </head>
+  <body>
+    <div id="login-container" class="login-container">
+      <h2>Вход пользователя</h2>
+      <form id="login-form" action="/login" method="post">
+        <label for="email">Email</label>
+        <input type="text" id="email" name="email" required />
+
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" required />
+
+        <button id="login-button" type="button" onclick="login()">Войти</button>
+        <div id="response" class="hidden"></div>
+      </form>
+      <p>Еще не зарегистрированы? <a href="/register/">Регистрация</a></p>
+    </div>
+
+    <script src="/static/js/login.js"></script>
+  </body>
+</html>
