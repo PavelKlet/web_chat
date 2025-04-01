@@ -1,0 +1,138 @@
+.spacer {
+  height: 100px; 
+}
+
+.friend-list-container {
+  border-radius: 5px;
+  padding: 10px;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  justify-content: center; 
+  align-items: center; 
+  border-radius: 25px;
+  margin-top: 50px;
+  background-color: rgba(0, 0, 0, 0.404);
+}
+
+.content-container {
+  flex-grow: 1;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 50px; 
+}
+
+
+.friend-link {
+  text-decoration: none; 
+  color: inherit; 
+}
+
+.friend-link:hover {
+  text-decoration: underline; 
+}
+
+.search-container {
+  position: fixed;
+  margin-left: 30%;
+  margin-top: 5px;
+}
+
+.search-container input[type="text"],
+.search-container button {
+  padding: 10px 10px;
+}
+
+.search-container input[type="text"]:focus {
+  outline: none; 
+}
+.search-container input[type="text"] {
+  margin-right: -5px; 
+  margin-bottom: 551px;
+  border-radius: 20px 0px 0px 20px;
+  padding: 10px 10px;
+}
+
+.search-container button {
+  padding: 12px 12px;
+  position: relative;
+  border-radius: 0px 20px 20px 0px;
+}
+
+.friends_list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.863);
+  background-repeat: repeat;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  color: white;
+  margin: 0;
+}
+
+
+button {
+  background-color: rgba(42, 87, 170, 0.863);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #850037;
+}
+
+.chat-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+}
+
+.web-chat {
+  color: white;
+  font-size: 19px;
+  font-weight: 700;
+  right: 90%;
+  position: fixed;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333333ec;
+  height: 50px;
+}
+
+.logout-button {
+  background-color: none;
+  position: fixed;
+  right: 10%;
+  top: 1.2%;
+  color: white;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.friend-container {
+  padding: 10px;
+  margin-top: 10px; 
+  background-color: rgba(32, 32, 32, 0.863);
+  width: 450px;
+  border-radius: 25px;
+}

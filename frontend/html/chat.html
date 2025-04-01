@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Личные сообщения</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/static/css/chat-styles.css">
+</head>
+<body>
+  <header>
+    <div class="chat-wrapper">
+        <div class="web-chat">WebChat</div>
+    </div>
+    <script src="/static/js/logout.js"></script>
+     <a onclick="logout()" class="logout-button">Выйти</a>
+  </header>
+  <h1>Личные сообщения</h1>
+
+  <div class="messages-container" id="messagesContainer"></div>
+  <div id="sendContainer">
+  <form id="sendMessageForm">
+    <input autocomplete="off" type="text" id="messageInput" placeholder="Введите сообщение">
+    <button type="submit">Отправить</button>
+  </form>
+</div>
+  <script src="/static/js/chat.js"></script>
+</body>
+</html>

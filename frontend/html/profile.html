@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/static/css/profile-styles.css">
+  <title>Профиль</title>
+  <script src="/static/js/profile.js"></script>
+</head>
+<body class="hidden">
+  <header>
+    <div class="chat-wrapper">
+        <div class="web-chat">WebChat</div>
+    </div>
+    <script src="/static/js/logout.js"></script>
+     <a onclick="logout()" class="logout-button">Выйти</a>
+  </header>
+  <div class="profile-wrapper">
+    <h1 class="shifting-h1">Профиль пользователя</h1>
+    <div class="shifting-avatar">
+      <img id="avatar_image" alt="Здесь может быть аватар" width="250" height="250">
+    </div>
+    <div class="shifting-name">
+      <p>
+        <label for="first_name">Имя:</label>
+        <span id="first_name_value"></span>
+      </p>
+      <p>
+        <label for="last_name">Фамилия:</label>
+        <span id="last_name_value"></span>
+      </p>
+    </div>
+    <a href="/update-profile" onclick="handleRequest();" class="edit-profile-link">Редактировать профиль</a>
+    <div class="friend-link-wrapper">
+      <a href="/user/friends/" class="link-users">Друзья</a>
+    </div>
+    <div id="friends_list_wrapper" class="friends-container">
+    </div>
+  </div>
+  <script>
+    getUserFriends();
+  </script>
+</body>
+</html>
+
+
+

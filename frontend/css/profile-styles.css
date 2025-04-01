@@ -1,0 +1,155 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.863);
+  overflow-x: hidden; 
+  margin: 0;
+  height: 100vh;
+}
+
+
+.shifting-h1 {
+  position: relative;
+  bottom: 1px;
+}
+
+.shifting-avatar {
+  position: relative;
+  bottom: 10px;
+  right: 2px;
+}
+
+.link-users {
+  color: white;
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.friend-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; 
+}
+
+.shifting-name {
+  position: relative;
+  bottom: 15px;
+  left: 2px;
+}
+
+.edit-profile-link {
+  position: relative;
+  bottom: 0px;
+  text-decoration: none;
+  color: white;
+}
+
+
+.chat-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+}
+
+.web-chat {
+  color: white;
+  font-size: 19px;
+  font-weight: 700;
+  right: 90%;
+  position: fixed;
+}
+
+.friend-link-wrapper {
+  position: absolute;
+  bottom: 10%;
+  width: 100%;
+  height: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  height: 50px;
+  z-index: 2;
+}
+
+.logout-button {
+  background-color: none;
+  position: fixed;
+  right: 10%;
+  top: 1.2%;
+  color: white;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+
+.profile-wrapper {
+  position: absolute;
+  padding: 20px;
+  margin-bottom: 20px;
+  bottom: 275px;
+  width: 500px;
+  height: 800px;
+  border-radius: 15px; 
+  background-color: rgba(0, 0, 0, 0.404);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.friends-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  background-color: rgba(0, 0, 0, 0.404);
+  border-radius: 0px 0px 15px 15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  width: 100%;
+  padding: 10px;
+}
+
+.friend-avatar-container {
+  margin-right: 10px;
+}
+
+.friend-avatar {
+  border-radius: 50%;
+}
+
+.friend-username {
+  margin: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+

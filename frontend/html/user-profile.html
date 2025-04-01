@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/static/css/user-profile.css"
+    />
+    <script src="/static/js/user-profile.js"></script>
+    <script>
+      CheckProtectUserId();
+    </script>
+    <title>Профиль</title>
+  </head>
+  <body class="body-style">
+    <header class="hidden">
+      <div class="chat-wrapper">
+        <div class="web-chat">WebChat</div>
+      </div>
+      <a onclick="logout()" class="logout-button">Выйти</a>
+    </header>
+    <div class="user-profile-container">
+      <h1 class="shifting-h1"></h1>
+      <div class="shifting-avatar">
+        <img
+          id="avatar_image"
+          alt="Здесь может быть аватар"
+          width="250"
+          height="250"
+        />
+      </div>
+      <div class="shifting-name">
+        <p>
+          <label for="first_name">Имя:</label>
+          <span id="first_name_value"></span>
+        </p>
+        <p>
+          <label for="last_name">Фамилия:</label>
+          <span id="last_name_value"></span>
+        </p>
+      </div>
+      <div class="shifrting-friend-add-div">
+        <button class="hidden">Добавить в друзья</button>
+      </div>
+    </div>
+    <script src="/static/js/logout.js"></script>
+  </body>
+</html>
