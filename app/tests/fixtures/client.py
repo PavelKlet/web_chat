@@ -7,7 +7,6 @@ from app.main import app
 
 @pytest_asyncio.fixture(scope="function")
 async def authorized_client(create_user):
-    """Создаёт авторизованный клиент."""
     auth_manager = AuthManager(None)
     token = auth_manager.create_access_token({"sub": create_user.email})
 
@@ -18,7 +17,6 @@ async def authorized_client(create_user):
 
 @pytest_asyncio.fixture(scope="function")
 async def client():
-    """Создаёт неавторизованный клиент."""
     client = AsyncClient(app=app, base_url="http://testserver")
     yield client
     await client.aclose()

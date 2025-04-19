@@ -19,7 +19,6 @@ async def test_get_profile_user(client):
 
 @pytest.mark.asyncio
 async def test_update_profile(authorized_client):
-    """Проверяет обновление профиля пользователя."""
     data = {"first_name": "Updated", "last_name": "Name"}
     response = await authorized_client.post("/update-profile/", data=data)
 
@@ -37,14 +36,10 @@ async def test_update_profile(authorized_client):
 
 @pytest.mark.asyncio
 class TestLoginUser:
-    """
-    Тесты для эндпоинта авторизации пользователя.
-    """
+
 
     async def test_login_user_success(self, client, create_user):
-        """
-        Проверяет успешную авторизацию пользователя.
-        """
+
 
         login_data = {
             "email": create_user.email,
@@ -60,9 +55,7 @@ class TestLoginUser:
         assert access_token is not None
 
     async def test_login_user_invalid_password(self, client, create_user):
-        """
-        Проверяет авторизацию с неправильным паролем.
-        """
+
         login_data = {
             "email": create_user.email,
             "password": "wrong_password"
@@ -74,9 +67,7 @@ class TestLoginUser:
         assert response.json()["detail"] == "Incorrect password"
 
     async def test_login_user_not_found(self, client):
-        """
-        Проверяет авторизацию для несуществующего пользователя.
-        """
+
         login_data = {
             "email": "nonexistent@example.com",
             "password": "test_password"

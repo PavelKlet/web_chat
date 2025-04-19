@@ -7,7 +7,6 @@ from app.infrastructure.models.users import User, Profile
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def create_user():
-    """Создаёт тестового пользователя в базе данных с реальным хешом пароля."""
     auth_manager = AuthManager(user_service=None)
 
     password = "test_password"
