@@ -129,9 +129,11 @@ button:hover {
   color: white;
   font-size: 19px;
   font-weight: 700;
+  right: 90%;
   position: fixed;
   text-decoration: none;
 }
+
 
 header {
   position: fixed;
