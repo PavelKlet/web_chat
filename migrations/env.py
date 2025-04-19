@@ -1,4 +1,4 @@
-from core.config import settings
+from app.infrastructure.config import settings
 import asyncio
 from logging.config import fileConfig
 
@@ -7,10 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
-from chat.models import Message, Room
-from users.models import User, Profile, friends
-
-from core.database import Base
+from app.infrastructure.database import Base
 
 
 # this is the Alembic Config object, which provides
@@ -28,6 +25,8 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
+from app.infrastructure.models.chat import Room, Message
+from app.infrastructure.models.users import User, Profile, friends
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 

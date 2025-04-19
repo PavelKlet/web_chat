@@ -10,5 +10,5 @@ RUN apt-get update && apt-get install -y libpq-dev gcc
 RUN pip install poetry
 COPY . /usr/src/app
 
-RUN poetry install --no-dev
+RUN poetry install --with dev --no-root
 CMD ["alembic", "upgrade", "head"]

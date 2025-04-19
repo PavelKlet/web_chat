@@ -22,6 +22,7 @@ async function getAccessToken() {
 
 
 async function initializeWebSocket() {
+  console.log("initializeWebSocket() called");
   let jwtToken = await getAccessToken();
   
   if (!jwtToken) {
@@ -35,7 +36,7 @@ async function initializeWebSocket() {
     if (recipient_id) {
       recipient_id = parseInt(recipient_id);
 
-    let socket = new WebSocket(`ws://localhost:8000/ws/${recipient_id}`);
+    let socket = new WebSocket(`ws://localhost/ws/${recipient_id}`);
     let messagesContainer = document.getElementById('messagesContainer');
     let sendMessageForm = document.getElementById('sendMessageForm');
     let messageInput = document.getElementById('messageInput');
@@ -44,16 +45,24 @@ async function initializeWebSocket() {
       console.log('WebSocket connection established');
       socket.send(jwtToken); 
     };
+
     
     socket.onmessage = (event) => {
       let messageData = JSON.parse(event.data);
+      if (!messageData || !messageData.text || messageData.text.trim() === "") {
+        return;
+      }
       let messageText = messageData.text;
       let avatarUrl = messageData.avatarUrl;
       addMessageToContainer(messageText, avatarUrl);
     };
 
-    socket.onclose = () => {
-      // window.location.href = '/profile/';
+    socket.onclose = (event) => {
+      if (event.code === 1008) {
+        window.location.href = '/profile/';
+      } else {
+        console.log('Соединение закрыто:', event);
+      }
     };
     
     function addMessageToContainer(messageText, avatarUrl) {
