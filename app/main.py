@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.exception_handlers import RequestValidationError
+from fastapi.responses import RedirectResponse
 
 from app.infrastructure.utils.redis_utils.redis_utils import redis_utils
 from app.infrastructure.config import templates
@@ -25,6 +26,13 @@ async def http_exception_handler(request, exc):
         {"request": request},
         status_code=400
     )
+
+@app.get("/")
+async def redirect_to_profile():
+    """
+    Redirects the root URL to the profile page.
+    """
+    return RedirectResponse(url="/profile")
 
 app.include_router(user_router, tags=["users"])
 app.include_router(chat_router, tags=["chat"])
