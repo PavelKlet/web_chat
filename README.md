@@ -33,7 +33,11 @@ Open .env and fill in the necessary fields, such as database credentials, Redis 
 
 Build and start the application using Docker Compose:
 
-docker-compose up --build
+Ensure the poetry.lock file is up-to-date:
+
+1. pip install poetry
+2. poetry lock
+3. docker-compose up --build
 
 Open your browser and navigate to:
 
@@ -83,7 +87,11 @@ docker-compose -f docker-compose.test.yaml up --build
 
 Соберите и запустите приложение с помощью Docker Compose:
 
-docker-compose up --build
+Убедитесь, что файл poetry.lock обновлен:
+
+1. pip install poetry
+2. poetry lock
+3. docker-compose up --build
 
 Откройте браузер и перейдите по адресу:
 
