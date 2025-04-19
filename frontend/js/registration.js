@@ -6,31 +6,29 @@ async function registerUser() {
   var confirm_password = form.elements.confirm_password.value;
 
   var errorDiv = document.getElementById("error-message");
+  var responseDiv = document.getElementById("response");
   errorDiv.innerHTML = "";
+  responseDiv.innerHTML = "";
 
   var emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
   if (!emailRegex.test(email)) {
-    var errorMessage = "Введите корректный email";
-    appendErrorMessage(errorMessage);
+    appendErrorMessage("Введите корректный email");
     return;
   }
 
   if (username.trim() === "") {
-    var errorMessage = "Введите ваше имя пользователя";
-    appendErrorMessage(errorMessage);
+    appendErrorMessage("Введите ваше имя пользователя");
     return;
   }
   
   var passwordRegex = /^(?=.*\d.*\d)[a-zA-Z0-9]{8,}$/;
   if (!passwordRegex.test(password)) {
-    var errorMessage = "Пароль должен содержать минимум 8 символов латинского алфавита и 2 цифры";
-    appendErrorMessage(errorMessage);
+    appendErrorMessage("Пароль должен содержать минимум 8 символов латинского алфавита и 2 цифры");
     return;
   }
 
   if (password !== confirm_password) {
-    var errorMessage = "Пароли не совпадают";
-    appendErrorMessage(errorMessage);
+    appendErrorMessage("Пароли не совпадают");
     return;
   }
 
@@ -51,22 +49,40 @@ async function registerUser() {
     });
 
     if (response.ok) {
-      var responseDiv = document.getElementById("response");
-      responseDiv.innerHTML = "Успешно";
-      window.location.href = "/login/";
+      responseDiv.innerHTML = "Регистрация прошла успешно!";
+      responseDiv.style.color = "green";
+      setTimeout(() => {
+        window.location.href = "/login/";
+      }, 200);
     } else {
-      var errorMessage = "Произошла ошибка при отправке запроса";
-      appendErrorMessage(errorMessage);
+      var errorData = await response.json();
+      if (errorData.detail) {
+        handleServerError(errorData.detail);
+      } else {
+        appendErrorMessage("Произошла ошибка при отправке запроса");
+      }
     }
   } catch (error) {
-    var errorMessage = "Произошла ошибка при отправке запроса";
-    appendErrorMessage(errorMessage);
+    appendErrorMessage("Произошла ошибка при отправке запроса");
+  }
+}
+
+function handleServerError(detail) {
+  var errorDiv = document.getElementById("error-message");
+  errorDiv.style.color = "red";
+
+  if (detail.includes("Email already exists")) {
+    errorDiv.innerHTML = "Этот email уже зарегистрирован.";
+  } else if (detail.includes("Username already exists")) {
+    errorDiv.innerHTML = "Это имя пользователя уже занято.";
+  } else {
+    errorDiv.innerHTML = "Произошла ошибка: " + detail;
   }
 }
 
 function appendErrorMessage(message) {
   var errorDiv = document.getElementById("error-message");
-  errorDiv.style.color = "white";
+  errorDiv.style.color = "red";
   errorDiv.innerHTML = message;
 }
 

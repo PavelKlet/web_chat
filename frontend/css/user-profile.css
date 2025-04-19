@@ -12,9 +12,8 @@ body {
     color: white;
 }
 
-
 button {
-    background-color: #a30881;
+    background-color: rgba(42, 87, 170, 0.863);
     color: white;
     border: none;
     cursor: pointer;
@@ -76,9 +75,11 @@ button:hover {
     color: white;
     font-size: 19px;
     font-weight: 700;
-    right: 95%;
+    right: 90%;
     position: fixed;
+    text-decoration: none;
 }
+
 
 header {
     position: fixed;
@@ -123,4 +124,26 @@ header {
   
 .friend-name {
     margin-top: 0;
+}
+
+.start-chat-wrapper {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+.start-chat-button {
+background-color: rgba(42, 87, 170, 0.863);
+color: white;
+padding: 10px 15px;
+border: none;
+text-decoration: none;
+border-radius: 5px;
+font-weight: bold;
+cursor: pointer;
+}
+  
+.start-chat-button:hover {
+background-color: #45a049;
 }

@@ -11,13 +11,20 @@
     <script src="/static/js/user-profile.js"></script>
     <script>
       CheckProtectUserId();
+      document.addEventListener("DOMContentLoaded", () => {
+      const urlParts = window.location.pathname.split("/");
+      const userId = urlParts[urlParts.length - 2];
+
+      const chatLink = document.getElementById("startChatLink");
+      chatLink.href = `/get/chat/?recipient_id=${userId}`;
+    });
     </script>
     <title>Профиль</title>
   </head>
   <body class="body-style">
-    <header class="hidden">
+    <header>
       <div class="chat-wrapper">
-        <div class="web-chat">WebChat</div>
+        <a href="/profile/" class="web-chat">WebChat</a>
       </div>
       <a onclick="logout()" class="logout-button">Выйти</a>
     </header>
@@ -43,6 +50,9 @@
       </div>
       <div class="shifrting-friend-add-div">
         <button class="hidden">Добавить в друзья</button>
+      </div>
+      <div class="start-chat-wrapper">
+        <a id="startChatLink" href="#" class="start-chat-button">Написать сообщение</a>
       </div>
     </div>
     <script src="/static/js/logout.js"></script>

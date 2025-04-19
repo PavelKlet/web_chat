@@ -9,20 +9,23 @@
   <body>
     <header>
       <div class="chat-wrapper">
-        <div class="web-chat">WebChat</div>
+        <a href="/profile/" class="web-chat">WebChat</a>
       </div>
       <div class="search-container">
         <form id="search_form" onsubmit="searchFriends(); return false;">
-            <input type="text" id="search_input" placeholder="Поиск друзей по username" />
-            <button type="submit">Поиск</button>
+          <input type="text" id="search_input" placeholder="Поиск друзей по username" />
+          <button type="submit">Поиск</button>
         </form>
       </div>
       <a onclick="logout()" class="logout-button">Выйти</a>
     </header>
-    <h1 >Друзья</h1>
+    <h1>Друзья</h1>
     <div class="friend-list-container">
-      <div class="content-container">
+      <div id="friends_section" class="content-container">
         <ul id="friends_list" class="friends_list"></ul>
+      </div>
+      <div id="search_section" class="content-container" style="display: none;">
+        <ul id="search_list" class="search_list"></ul>
       </div>
     </div>
     <script src="/static/js/user-friends.js"></script>

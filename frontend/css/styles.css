@@ -35,6 +35,7 @@ button:hover {
     font-weight: 700;
     right: 90%;
     position: fixed;
+    text-decoration: none;
 }
 
 header {
