@@ -23,9 +23,6 @@ The front-end is implemented with JavaScript, HTML, and CSS, located in the `fro
 - **Cache:** Redis
 - **Authentication:** JWT-based
 
-### Frontend
-- **Languages:** JavaScript, HTML, CSS
-
 ### Set Up Environment Variables
 
 Copy the example environment file to create your .env file:
@@ -75,9 +72,6 @@ docker-compose -f docker-compose.test.yaml up --build
 - **База данных:** PostgreSQL 
 - **Кэш:** Redis
 - **Аутентификация:** JWT-based
-
-### Frontend
-- **Языки:** JavaScript, HTML, CSS
 
 ### Настройка переменных окружения
 
