@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.exception_handlers import RequestValidationError
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.infrastructure.utils.redis_utils.redis_utils import redis_utils
 from app.infrastructure.config import templates
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(CORSMiddleware, allow_origins=["*"])
 
 @app.exception_handler(RequestValidationError)
 async def http_exception_handler(request, exc):

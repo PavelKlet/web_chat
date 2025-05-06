@@ -56,8 +56,8 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_HOST = ${DB_HOST}
-      - POSTGRES_PORT = ${DB_PORT}
+      - POSTGRES_HOST=${DB_HOST}
+      - POSTGRES_PORT=${DB_PORT}
     volumes:
       - ./data/db:/var/lib/postgresql/data
   rabbitmq:

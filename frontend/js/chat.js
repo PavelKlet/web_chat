@@ -57,6 +57,11 @@ async function initializeWebSocket() {
       addMessageToContainer(messageText, avatarUrl);
     };
 
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+    
+
     socket.onclose = (event) => {
       if (event.code === 1008) {
         window.location.href = '/profile/';
