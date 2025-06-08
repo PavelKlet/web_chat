@@ -55,20 +55,20 @@ class WebsocketManager:
         cached_messages = await self.redis_utils.get_messages_list(room_id)
 
         if cached_messages:
-            for message in reversed(cached_messages):
-                await websocket.send_json(message)
+            await websocket.send_json(list(reversed(cached_messages)))
         else:
             messages = await chat_service.get_messages_for_room(room_id)
-
+            message_list = []
             for message in messages:
                 message_dict = {
                     "text": message.text,
                     "user_id": message.user_id,
                     "avatarUrl": user.profile.avatar if message.user_id == user.id else recipient.profile.avatar
                 }
-                await websocket.send_json(message_dict)
-
+                message_list.append(message_dict)
                 await self.redis_utils.add_message_to_list(room_id, message_dict)
+
+            await websocket.send_json(message_list)
 
         return room_data["connections"], room, user, recipient
 
