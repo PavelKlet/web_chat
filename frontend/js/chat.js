@@ -49,12 +49,19 @@ async function initializeWebSocket() {
     
     socket.onmessage = (event) => {
       let messageData = JSON.parse(event.data);
-      if (!messageData || !messageData.text || messageData.text.trim() === "") {
-        return;
+    
+      if (Array.isArray(messageData)) {
+        messageData.forEach((msg) => {
+          if (msg && msg.text && msg.text.trim() !== "") {
+            addMessageToContainer(msg.text, msg.avatarUrl);
+          }
+        });
+      } 
+      else if (messageData && messageData.text && messageData.text.trim() !== "") {
+        addMessageToContainer(messageData.text, messageData.avatarUrl);
+      } else {
+        console.warn("Неизвестный формат сообщения:", messageData);
       }
-      let messageText = messageData.text;
-      let avatarUrl = messageData.avatarUrl;
-      addMessageToContainer(messageText, avatarUrl);
     };
 
     socket.onerror = (error) => {
@@ -73,14 +80,14 @@ async function initializeWebSocket() {
     function addMessageToContainer(messageText, avatarUrl) {
       let messageElement = document.createElement('div');
       messageElement.classList.add('message');
-      messageElement.style.marginBottom = '10px'; 
+      messageElement.style.marginBottom = '10px';
     
       let avatarElement = document.createElement('img');
       avatarElement.classList.add('avatar');
       avatarElement.src = avatarUrl;
-      avatarElement.style.width = '50px'; 
-      avatarElement.style.height = '50px'; 
-      avatarElement.style.borderRadius = '50%'; 
+      avatarElement.style.width = '50px';
+      avatarElement.style.height = '50px';
+      avatarElement.style.borderRadius = '50%';
       messageElement.appendChild(avatarElement);
     
       let messageTextElement = document.createElement('div');
@@ -91,19 +98,21 @@ async function initializeWebSocket() {
       messagesContainer.appendChild(messageElement);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-    
-    function sendMessage(text) {
-      socket.send(text);
-    }
-    
+
     sendMessageForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      let inputText = messageInput.value;
-      if (inputText) {
-        sendMessage(inputText);
+    event.preventDefault();
+    let inputText = messageInput.value.trim();
+    if (inputText) {
+      try {
+        socket.send(inputText); 
         messageInput.value = '';
-      }
-    });
+      } catch (error) {
+      console.error("Ошибка при отправке сообщения:", error);
+    }
+  } else {
+    console.warn("Сообщение не может быть пустым.");
+  }
+  });
   }
 }
 }

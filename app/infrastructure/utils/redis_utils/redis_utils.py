@@ -55,7 +55,7 @@ class RedisUtils:
         key = f"chat:room:{room_id}:messages"
         await client.lpush(key, json.dumps(message))
         await client.ltrim(key, 0, 499)
-        await client.expire(key, 5)
+        await client.expire(key, 10)
         await client.aclose()
 
     async def get_messages_list(self, room_id: int, start: int = 0, end: int = -1):
