@@ -56,14 +56,6 @@ class ChatService:
 
         return new_message
 
-    async def delete_message(self, message_id: int):
-        """
-        Deletes a message by its ID.
-        """
-        message = await self.message_repository.get_by_id(message_id)
-        if message:
-            await self.message_repository.delete(message)
-
     async def get_and_create_room_by_users(self, sender: Mapped[int], recipient: int) -> Room:
         """
         Retrieves a chat room that connects two users.
