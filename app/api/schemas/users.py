@@ -31,8 +31,6 @@ class FriendData(BaseModel):
     last_name: Optional[str]
 
 
-
-
 class UserProfileData(BaseModel):
     username: str
     first_name: Optional[str]

@@ -1,9 +1,5 @@
-from pathlib import Path
 from pydantic_settings import BaseSettings
 from fastapi.templating import Jinja2Templates
-
-
-BASE_DIRECTORY = Path(__file__).absolute().parent.parent
 
 
 class Settings(BaseSettings):
@@ -18,6 +14,12 @@ class Settings(BaseSettings):
     redis_host: str = "localhost"
     redis_port: int = 6379
 
+    mongo_user: str
+    mongo_pass: str
+    mongo_host: str = "localhost"
+    mongo_port: int = 27017
+    mongo_db_name: str
+
     email_username: str
     email_host: str
     email_port: int
@@ -31,8 +33,13 @@ class Settings(BaseSettings):
             f"{self.db_host}:{self.db_port}/{self.db_name}"
         )
 
-    # class Config:
-    #     env_file = f"{BASE_DIRECTORY}/.env"
+    @property
+    def mongo_uri(self) -> str:
+        return (
+            f"mongodb://{self.mongo_user}:{self.mongo_pass}@"
+            f"{self.mongo_host}:{self.mongo_port}/"
+            f"{self.mongo_db_name}?authSource=admin"
+        )
 
 
 settings = Settings()

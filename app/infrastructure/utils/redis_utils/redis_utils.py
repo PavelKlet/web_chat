@@ -1,7 +1,7 @@
 import json
-from typing import Any
+from typing import Any, Union
 import redis.asyncio as redis
-from app.infrastructure.config import settings
+from app.infrastructure.config.config import settings
 
 
 class RedisUtils:
@@ -47,15 +47,21 @@ class RedisUtils:
         await client.expire(key, expire)
         await client.aclose()
 
-    async def add_message_to_list(self, room_id: int, message: dict):
+    async def add_message_to_list(self, room_id: int, messages: Union[dict, list[dict]]):
         """
-            Adds a message to the list of messages for a specific chat room.
+        Adds one or multiple messages to the list of messages for a specific chat room.
         """
         client = redis.Redis.from_pool(self._pool)
         key = f"chat:room:{room_id}:messages"
-        await client.lpush(key, json.dumps(message))
+
+        if isinstance(messages, dict):
+            messages = [messages]
+
+        json_messages = [json.dumps(message) for message in messages]
+        await client.lpush(key, *json_messages)
         await client.ltrim(key, 0, 499)
         await client.expire(key, 10)
+
         await client.aclose()
 
     async def get_messages_list(self, room_id: int, start: int = 0, end: int = -1):

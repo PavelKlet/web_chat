@@ -3,10 +3,10 @@ from typing import Tuple, List, Optional
 from fastapi import WebSocket, HTTPException
 
 from app.infrastructure.auth.auth_manager import AuthManager
-from app.infrastructure.models.chat import Room
+from app.infrastructure.models.relational.rooms import Room
 from app.application.services.chat import ChatService
 from app.application.services.user import UserService
-from app.infrastructure.models.users import User
+from app.infrastructure.models.relational.users import User
 from app.infrastructure.utils.redis_utils.redis_utils import RedisUtils, redis_utils
 
 class WebsocketManager:
@@ -47,7 +47,7 @@ class WebsocketManager:
             await websocket.close(code=1008)
             return
 
-        room = await chat_service.get_room_by_users(user.id, user_id_recipient)
+        room = await chat_service.get_and_create_room_by_users(user.id, user_id_recipient)
         room_id = room.id
         room_data = self.rooms.setdefault(room_id, {"connections": []})
         room_data["connections"].append(websocket)
@@ -56,19 +56,20 @@ class WebsocketManager:
 
         if cached_messages:
             await websocket.send_json(list(reversed(cached_messages)))
+            print("CACHED")
         else:
+            print("NOT CACHED")
             messages = await chat_service.get_messages_for_room(room_id)
-            message_list = []
-            for message in messages:
-                message_dict = {
+            message_list = [
+                {
                     "text": message.text,
                     "user_id": message.user_id,
                     "avatarUrl": user.profile.avatar if message.user_id == user.id else recipient.profile.avatar
                 }
-                message_list.append(message_dict)
-                await self.redis_utils.add_message_to_list(room_id, message_dict)
-
+                for message in messages
+            ]
             await websocket.send_json(message_list)
+            await self.redis_utils.add_message_to_list(room_id, message_list)
 
         return room_data["connections"], room, user, recipient
 
@@ -93,16 +94,15 @@ class WebsocketManager:
 
         data["avatarUrl"] = avatar_url
 
+        for connection in room_connections:
+            await connection.send_json(data)
+
         if await self.redis_utils.message_list_exists(room_id):
             await self.redis_utils.add_message_to_list(room_id, {
                 "text": message.text,
                 "user_id": message.user_id,
                 "avatarUrl": avatar_url
             })
-
-        for connection in room_connections:
-            await connection.send_json(data)
-
 
     async def delete_room(self, room_id: str) -> None:
         """

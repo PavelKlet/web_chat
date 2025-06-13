@@ -3,23 +3,23 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.exception_handlers import RequestValidationError
 from fastapi.responses import RedirectResponse
-from fastapi.middleware.cors import CORSMiddleware
 
 from app.infrastructure.utils.redis_utils.redis_utils import redis_utils
-from app.infrastructure.config import templates
+from app.infrastructure.config.config import templates
 from .api.chat import router as chat_router
 from .api.users import router as user_router
+from .infrastructure.config.database import init_mongo, mongo_db
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await init_mongo()
     yield
     await redis_utils.pool_disconnect()
+    mongo_db.client.close()
 
 
 app = FastAPI(lifespan=lifespan)
-
-app.add_middleware(CORSMiddleware, allow_origins=["*"])
 
 @app.exception_handler(RequestValidationError)
 async def http_exception_handler(request, exc):

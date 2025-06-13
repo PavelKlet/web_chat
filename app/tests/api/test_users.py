@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy import select
 
-from app.infrastructure.database import async_session_maker
-from app.infrastructure.models.users import Profile
+from app.infrastructure.config.database import async_session_maker
+from app.infrastructure.models.relational.users import Profile
 from app.tests.fixtures.client import authorized_client
 
 @pytest.mark.asyncio

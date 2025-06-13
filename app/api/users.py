@@ -14,11 +14,12 @@ from fastapi import (
 from app.infrastructure.auth.auth_manager import get_auth_manager, get_current_user, \
     AuthManager
 from app.api.dependencies import UserServiceDep
-from app.infrastructure.models.users import User
-from app.infrastructure.config import templates
+from app.infrastructure.models.relational.users import User
+from app.infrastructure.config.config import templates
 from .schemas.users import FriendData, UserProfileData, UserCreate
 from app.infrastructure.utils.other import filter_none_values
 from app.api.schemas.users import UserData
+from ..application.exceptions import EmailAlreadyExistsException, UsernameAlreadyExistsException
 
 router = APIRouter()
 
@@ -205,11 +206,16 @@ async def register_user(
     """
 
     hashed_password = authorization_manager.get_password_hash(user.password)
-    await user_service.register_user({
-        "email": user.email,
-        "hashed_password": hashed_password,
-        "username": user.username
-    })
+    try:
+        await user_service.register_user({
+            "email": user.email,
+            "hashed_password": hashed_password,
+            "username": user.username
+        })
+    except EmailAlreadyExistsException as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except UsernameAlreadyExistsException as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     return {"message": "User registered successfully"}
 
