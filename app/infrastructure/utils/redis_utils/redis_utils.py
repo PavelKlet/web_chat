@@ -58,9 +58,10 @@ class RedisUtils:
             messages = [messages]
 
         json_messages = [json.dumps(message) for message in messages]
-        await client.lpush(key, *json_messages)
-        await client.ltrim(key, 0, 499)
-        await client.expire(key, 10)
+        if json_messages:
+            await client.lpush(key, *json_messages)
+            await client.ltrim(key, 0, 499)
+            await client.expire(key, 10)
 
         await client.aclose()
 
