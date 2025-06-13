@@ -2,14 +2,14 @@ from typing import Optional, Dict, Any, Sequence
 from sqlalchemy.future import select
 from sqlalchemy import insert, func
 from sqlalchemy.orm import selectinload, joinedload
-from app.infrastructure.models.users import User, Profile, friends
 from starlette.datastructures import UploadFile
 from fastapi import HTTPException
 
+from app.infrastructure.models.relational.users import User, Profile, friends
 from app.infrastructure.utils.redis_utils.redis_utils import redis_utils
-from .base import SQLAlchemyRepository
+from app.infrastructure.repositories.relational.base import SQLAlchemyRepository
 from app.infrastructure.utils.files import save_and_get_avatar_path
-from app.infrastructure.task_manager.tasks import send_registration_email
+# from app.infrastructure.task_manager.tasks import send_registration_email
 
 class UserRepository(SQLAlchemyRepository):
     """
@@ -92,7 +92,7 @@ class UserRepository(SQLAlchemyRepository):
         """
         stmt = (
             select(User)
-            .where(User.username.contains(username_substring))
+            .where(func.lower(User.username).contains(func.lower(username_substring)))
             .options(selectinload(User.profile))
             .order_by(User.id)
             .offset((page - 1) * limit)
@@ -147,7 +147,7 @@ class UserRepository(SQLAlchemyRepository):
             new_profile = Profile(avatar="/media/default/default.png")
             new_user.profile = new_profile
             self.session.add(new_user)
-            send_registration_email.delay(user_data["email"])
+            # send_registration_email.delay(user_data["email"])
 
         except Exception as e:
             await self.session.rollback()

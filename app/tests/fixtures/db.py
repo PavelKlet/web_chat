@@ -1,6 +1,6 @@
 import pytest_asyncio
 
-from app.infrastructure.database import engine, Base
+from app.infrastructure.config.database import engine, Base
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)

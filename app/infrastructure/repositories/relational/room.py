@@ -2,8 +2,8 @@ import uuid
 
 from sqlalchemy import select
 
-from app.infrastructure.repositories.base import SQLAlchemyRepository
-from app.infrastructure.models.chat import Room
+from app.infrastructure.repositories.relational.base import SQLAlchemyRepository
+from app.infrastructure.models.relational.rooms import Room
 
 
 class RoomRepository(SQLAlchemyRepository):
@@ -16,7 +16,7 @@ class RoomRepository(SQLAlchemyRepository):
 
     model = Room
 
-    async def get_room_by_users(self, sender: int, recipient: int) -> Room:
+    async def get_and_create_room_by_users(self, sender: int, recipient: int) -> Room:
         """
             Retrieves an existing chat room between two users or creates a new one
             if no room exists.

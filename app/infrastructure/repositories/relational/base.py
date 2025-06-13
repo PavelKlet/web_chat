@@ -1,8 +1,9 @@
 from typing import Optional, TypeVar, Dict
+
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.infrastructure.database import Base
+from app.infrastructure.config.database import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 

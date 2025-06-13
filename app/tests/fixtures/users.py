@@ -1,8 +1,8 @@
 import pytest_asyncio
 
 from app.infrastructure.auth.auth_manager import AuthManager
-from app.infrastructure.database import async_session_maker
-from app.infrastructure.models.users import User, Profile
+from app.infrastructure.config.database import async_session_maker
+from app.infrastructure.models.relational.users import User, Profile
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)

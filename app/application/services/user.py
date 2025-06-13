@@ -1,10 +1,9 @@
 from typing import Optional, Dict, Any, Sequence
 
-from app.infrastructure.repositories.user import UserRepository
+from app.infrastructure.repositories.relational.user import UserRepository
 from app.application.unit_of_work.unit_of_work import UnitOfWork
-from app.infrastructure.models.users import Profile, User
-from fastapi import HTTPException
-
+from app.infrastructure.models.relational.users import Profile, User
+from ..exceptions import EmailAlreadyExistsException, UsernameAlreadyExistsException
 
 class UserService:
     """
@@ -89,13 +88,12 @@ class UserService:
         async with self.uow:
 
             existing_email_user = await self.uow.user.get_user_by_email(user_data["email"])
-
             if existing_email_user:
-                raise HTTPException(status_code=400, detail="Email already exists")
+                raise EmailAlreadyExistsException("Email already exists")
 
             existing_username_user = await self.uow.user.get_user_by_username(user_data["username"])
             if existing_username_user:
-                raise HTTPException(status_code=400, detail="Username already exists")
+                raise UsernameAlreadyExistsException("Username already exists")
 
             await self.uow.user.user_register(user_data)
 

@@ -1,10 +1,12 @@
 from jose import jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
+
 from fastapi import HTTPException, Request, Depends
-from ..config import settings
+
+from ..config.config import settings
 from app.application.services.user import UserService
-from ..models.users import User
+from app.infrastructure.models.relational.users import User
 from app.api.dependencies import UserServiceDep
 
 

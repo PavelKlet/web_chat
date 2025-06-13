@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 class IUnitOfWork(ABC):
@@ -19,6 +20,12 @@ class IUnitOfWork(ABC):
 
     @abstractmethod
     async def rollback(self): ...
+
+    @abstractmethod
+    def set_repository(self, name, repository_class): ...
+
+    @abstractmethod
+    def __getattr__(self, name): ...
 
 
 class UnitOfWork(IUnitOfWork):

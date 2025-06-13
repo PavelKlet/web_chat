@@ -5,6 +5,9 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: on-failure
+    deploy:
+      restart_policy:
+        max_attempts: 5
     env_file:
       - .env
     environment:
@@ -28,6 +31,10 @@ services:
       - ./poetry.lock:/usr/src/app/poetry.lock
       - ./pyproject.toml:/usr/src/app/pyproject.toml
   redis:
+    restart: on-failure
+    deploy:
+      restart_policy:
+        max_attempts: 5
     container_name: redis
     image: redis:latest
     environment:
@@ -35,7 +42,27 @@ services:
       - REDIS_PORT=6379
     ports:
       - "6379:6379"
+  mongo:
+    restart: on-failure
+    deploy:
+      restart_policy:
+        max_attempts: 5
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./data/mongo:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+    env_file:
+      - ./.env
   nginx:
+    restart: on-failure
+    deploy:
+      restart_policy:
+        max_attempts: 5
     image: nginx:latest
     container_name: nginx
     ports:
@@ -47,6 +74,10 @@ services:
     depends_on:
       - api
   db:
+    restart: on-failure
+    deploy:
+      restart_policy:
+        max_attempts: 5
     image: postgres:16
     ports:
       - "5432:5432"
@@ -61,6 +92,10 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
   rabbitmq:
+    restart: on-failure
+    deploy:
+      restart_policy:
+        max_attempts: 5
     container_name: rabbitmq
     image: "rabbitmq:3-management"
     environment:
@@ -73,7 +108,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: always
+    restart: on-failure
+    deploy:
+      restart_policy:
+        max_attempts: 5
     env_file:
       - .env
     environment:
@@ -86,7 +124,7 @@ services:
     command: [
       "bash",
       "-c",
-      "poetry run celery -A app.infrastructure.celery_settings.app worker --loglevel=info"
+      "poetry run celery -A app.infrastructure.config.celery_settings.app worker --loglevel=info"
     ]
     volumes:
       - ./app:/usr/src/app/app

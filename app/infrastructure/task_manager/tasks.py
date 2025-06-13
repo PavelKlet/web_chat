@@ -2,8 +2,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from app.infrastructure.config import settings
-from app.infrastructure.celery_settings import app
+from app.infrastructure.config.config import settings
+from app.infrastructure.config.celery_settings import app
 
 def send_email(receiver_email, subject, body):
 
