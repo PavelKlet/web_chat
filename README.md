@@ -21,6 +21,7 @@ The front-end is implemented with JavaScript, HTML, and CSS, located in the `fro
 - **Framework:** FastAPI
 - **Database:** PostgreSQL 
 - **Cache:** Redis
+- **Message database:** MongoDB
 - **Authentication:** JWT-based
 
 ### Set Up Environment Variables
@@ -75,6 +76,7 @@ docker-compose -f docker-compose.test.yaml up --build
 - **Фреймворк:** FastAPI
 - **База данных:** PostgreSQL 
 - **Кэш:** Redis
+- **База данных для сообщений:** MongoDB
 - **Аутентификация:** JWT-based
 
 ### Настройка переменных окружения
