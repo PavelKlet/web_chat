@@ -212,10 +212,9 @@ async def register_user(
             "hashed_password": hashed_password,
             "username": user.username
         })
-    except EmailAlreadyExistsException as e:
+    except (EmailAlreadyExistsException, UsernameAlreadyExistsException) as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except UsernameAlreadyExistsException as e:
-        raise HTTPException(status_code=400, detail=str(e))
+
 
     return {"message": "User registered successfully"}
 
