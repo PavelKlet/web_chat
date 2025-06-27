@@ -1,0 +1,34 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  script:
+    - docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit
+    - docker-compose -f docker-compose.test.yaml logs test-api
+  after_script:
+    - docker-compose -f docker-compose.test.yaml down -v
+
+build:
+  stage: build
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker-compose -f docker-compose.yaml build
+    - docker-compose -f docker-compose.yaml push
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - mkdir -p ~/.ssh
+    - echo "$DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H "$DEPLOY_SERVER" >> ~/.ssh/known_hosts
+    - ssh $DEPLOY_SERVER "docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASSWORD' $CI_REGISTRY"
+    - rsync -av --exclude='node_modules' ./docker-compose.yaml $DEPLOY_SERVER:$DEPLOY_PATH/
+    - ssh $DEPLOY_SERVER "cd $DEPLOY_PATH && docker-compose pull && docker-compose up -d --build"
+  only:
+    - main
