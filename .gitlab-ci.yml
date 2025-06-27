@@ -6,6 +6,10 @@ stages:
 test:
   stage: test
   script:
+    - echo "Текущая рабочая директория:"
+    - pwd
+    - echo "Список файлов в текущей директории:"
+    - ls -la
     - docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit
     - docker-compose -f docker-compose.test.yaml logs test-api
   after_script:
