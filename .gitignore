@@ -5,7 +5,6 @@
 .DS_Store
 /.Python
 
-*.lock
 ../app/.env
 dumps/
 *.log
