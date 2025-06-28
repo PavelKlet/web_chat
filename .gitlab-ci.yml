@@ -6,8 +6,6 @@ stages:
 test:
   stage: test
   before_script:
-    - rm -rf $CI_PROJECT_DIR/*
-    - git clean -fdx
     - docker-compose -f docker-compose.test.yaml down -v
     - docker system prune -af --volumes
     - docker volume prune -f
