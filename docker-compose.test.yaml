@@ -13,13 +13,12 @@ services:
     depends_on:
       - test_db
     volumes:
-#      - ./app:/usr/src/app/app
-#      - ./frontend:/usr/src/app/frontend
-#      - ./migrations:/usr/src/app/migrations
-#      - ./media:/usr/src/app/media
-#      - ./poetry.lock:/usr/src/app/poetry.lock
-#      - ./pyproject.toml:/usr/src/app/pyproject.toml
-    - ./:/usr/src/app
+      - ./app:/usr/src/app/app
+      - ./frontend:/usr/src/app/frontend
+      - ./migrations:/usr/src/app/migrations
+      - ./media:/usr/src/app/media
+      - ./poetry.lock:/usr/src/app/poetry.lock
+      - ./pyproject.toml:/usr/src/app/pyproject.toml
     networks:
       - test-net
   test_db:

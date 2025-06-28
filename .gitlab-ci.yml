@@ -10,6 +10,12 @@ test:
     - docker system prune -af
     - docker volume prune -f
   script:
+    - echo "Текущая структура файлов:"
+    - ls -la
+    - echo "Проверяем pyproject.toml:"
+    - if [ -d ./pyproject.toml ]; then echo "Это директория!"; fi
+    - if [ -f ./pyproject.toml ]; then echo "Это файл!"; fi
+    - docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit
     - echo "Проверяем файлы:"
     - ls -la ./init.sql ./pyproject.toml
     - echo "Текущая рабочая директория:"
