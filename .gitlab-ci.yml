@@ -5,6 +5,10 @@ stages:
 
 test:
   stage: test
+  before_script:
+    - docker-compose -f docker-compose.test.yaml down -v
+    - docker system prune -af
+    - docker volume prune -f
   script:
     - echo "Проверяем файлы:"
     - ls -la ./init.sql ./pyproject.toml
