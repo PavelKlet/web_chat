@@ -5,10 +5,6 @@ stages:
 
 test:
   stage: test
-  before_script:
-    - docker-compose -f docker-compose.test.yaml down -v
-    - docker system prune -af --volumes
-    - docker volume prune -f
   script:
     - find . -name "pyproject.toml" -exec ls -ld {} \;
     - echo "Текущая структура файлов:"
@@ -25,6 +21,8 @@ test:
     - ls -la
     - docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit
     - docker-compose -f docker-compose.test.yaml logs test-api
+  after_script:
+    - docker-compose -f docker-compose.test.yaml down -v
 
 build:
   stage: build
