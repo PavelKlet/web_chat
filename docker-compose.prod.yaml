@@ -65,6 +65,9 @@ services:
       - web-net
 
   nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
     restart: on-failure
     deploy:
       restart_policy:
