@@ -25,6 +25,8 @@ services:
     depends_on:
       - redis
       - db
+    volumes:
+      - ./media:/media
     networks:
       - web-net
 
