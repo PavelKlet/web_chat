@@ -26,7 +26,7 @@ services:
     tmpfs:
       - /var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5434:5432"
     networks:
       - test-net
 
