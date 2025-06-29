@@ -16,16 +16,6 @@ test:
 build:
   stage: build
   script:
-    - mkdir -p /builds/pavelklet-group/web_chat
-    - cd /builds/pavelklet-group/web_chat
-    - |
-    - if [ ! -d .git ]; then
-    - git clone $CI_REPOSITORY_URL .
-    - fi
-    - git reset --hard HEAD
-    - git clean -fd
-    - git pull origin $CI_COMMIT_REF_NAME
-    - cp $ENV ./.env
     - docker-compose -f docker-compose.prod.yaml build
   only:
     - main
