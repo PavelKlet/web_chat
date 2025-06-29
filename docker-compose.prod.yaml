@@ -22,6 +22,8 @@ services:
       "-c",
       "poetry run alembic upgrade head && poetry run uvicorn app.main:app --reload --port 8000 --host 0.0.0.0"
     ]
+    volumes:
+      - ./media:/usr/src/app/media
     depends_on:
       - redis
       - db
