@@ -26,7 +26,7 @@ services:
       - redis
       - db
     volumes:
-      - ./media:/media
+      - ./media:/usr/src/app/media
     networks:
       - web-net
 
