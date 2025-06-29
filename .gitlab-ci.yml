@@ -24,6 +24,7 @@ build:
 deploy:
   stage: deploy
   script:
+    - cp $ENV ./.env
     - docker-compose pull
     - docker-compose up -d
   only:
