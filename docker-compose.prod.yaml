@@ -1,5 +1,6 @@
 
 services:
+
   api:
     build:
       context: .
@@ -24,6 +25,9 @@ services:
     depends_on:
       - redis
       - db
+    networks:
+      - web-net
+
   redis:
     restart: on-failure
     deploy:
@@ -37,6 +41,7 @@ services:
       - REDIS_PORT=6379
     ports:
       - "6379:6379"
+
   mongo:
     restart: on-failure
     deploy:
@@ -54,6 +59,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
     env_file:
       - ./.env
+
   nginx:
     restart: on-failure
     deploy:
@@ -66,6 +72,9 @@ services:
       - "80:80"
     depends_on:
       - api
+    networks:
+      - web-net
+
   db:
     restart: on-failure
     deploy:
@@ -85,6 +94,7 @@ services:
       - POSTGRES_PORT=${DB_PORT}
     volumes:
       - ./data/db:/var/lib/postgresql/data
+
   rabbitmq:
     restart: on-failure
     deploy:
@@ -99,6 +109,7 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
   worker:
     build:
       context: .
@@ -122,3 +133,7 @@ services:
       "-c",
       "poetry run celery -A app.infrastructure.config.celery_settings.app worker --loglevel=info"
     ]
+
+networks:
+  web-net:
+    driver: bridge
