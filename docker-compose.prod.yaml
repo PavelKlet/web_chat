@@ -41,6 +41,8 @@ services:
       - REDIS_PORT=6379
     ports:
       - "6379:6379"
+    networks:
+      - web-net
 
   mongo:
     restart: on-failure
@@ -59,6 +61,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
     env_file:
       - ./.env
+    networks:
+      - web-net
 
   nginx:
     restart: on-failure
@@ -94,6 +98,8 @@ services:
       - POSTGRES_PORT=${DB_PORT}
     volumes:
       - ./data/db:/var/lib/postgresql/data
+    networks:
+      - web-net
 
   rabbitmq:
     restart: on-failure
@@ -109,6 +115,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - web-net
 
   worker:
     build:
@@ -133,6 +141,8 @@ services:
       "-c",
       "poetry run celery -A app.infrastructure.config.celery_settings.app worker --loglevel=info"
     ]
+    networks:
+      - web-net
 
 networks:
   web-net:
