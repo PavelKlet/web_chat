@@ -36,7 +36,9 @@ async function initializeWebSocket() {
     if (recipient_id) {
       recipient_id = parseInt(recipient_id);
 
-    let socket = new WebSocket(`ws://localhost/ws/${recipient_id}`);
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = window.location.host;
+    let socket = new WebSocket(`${wsProtocol}//${wsHost}/ws/${recipient_id}`);
     let messagesContainer = document.getElementById('messagesContainer');
     let sendMessageForm = document.getElementById('sendMessageForm');
     let messageInput = document.getElementById('messageInput');
