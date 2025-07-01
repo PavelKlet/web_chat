@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from fastapi import HTTPException, Request, Depends
 
-from ..config.config import settings
+from app.infrastructure.config.config import settings
 from app.application.services.user import UserService
 from app.infrastructure.models.relational.users import User
 from app.api.dependencies import UserServiceDep

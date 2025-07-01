@@ -11,7 +11,7 @@ from fastapi import (
     Response,
 )
 
-from app.infrastructure.auth.auth_manager import get_auth_manager, get_current_user, \
+from app.application.services.auth.auth_manager import get_auth_manager, get_current_user, \
     AuthManager
 from app.api.dependencies import UserServiceDep
 from app.infrastructure.models.relational.users import User

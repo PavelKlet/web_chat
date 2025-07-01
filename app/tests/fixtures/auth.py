@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from app.infrastructure.auth.auth_manager import AuthManager
+from app.application.services.auth.auth_manager import AuthManager
 
 
 @pytest.fixture

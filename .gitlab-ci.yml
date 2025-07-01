@@ -22,9 +22,20 @@ build:
 
 deploy:
   stage: deploy
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H 91.184.252.249 >> ~/.ssh/known_hosts
   script:
-    - cp $ENV ./.env
-    - docker-compose -f docker-compose.prod.yaml up -d
+    - rsync -avz --delete --exclude='media/' ./ root@91.184.252.249:/builds/pavelklet-group
+    - ssh user@your-server.com "
+        cd /builds/pavelklet-group &&
+        cp \$ENV .env &&
+        docker-compose -f docker-compose.prod.yaml up -d
+      "
   only:
     - main
 

@@ -2,7 +2,7 @@ from typing import Tuple, List, Optional
 
 from fastapi import WebSocket, HTTPException
 
-from app.infrastructure.auth.auth_manager import AuthManager
+from app.application.services.auth.auth_manager import AuthManager
 from app.infrastructure.models.relational.rooms import Room
 from app.application.services.chat import ChatService
 from app.application.services.user import UserService

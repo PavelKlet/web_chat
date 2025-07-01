@@ -2,10 +2,10 @@ from fastapi import WebSocket, Request, APIRouter, Depends
 from fastapi.exception_handlers import HTTPException
 from fastapi.websockets import WebSocketDisconnect
 
-from app.infrastructure.auth.auth_manager import AuthManager, get_auth_manager
+from app.application.services.auth.auth_manager import AuthManager, get_auth_manager
 from app.infrastructure.config.config import templates
 from .dependencies import ChatServiceDep, UserServiceDep
-from app.infrastructure.websocket.websocket_manager import websocket_manager
+from app.application.services.websocket.websocket_manager import websocket_manager
 
 router = APIRouter()
 

@@ -1,7 +1,7 @@
 import pytest_asyncio
 from httpx import AsyncClient
 
-from app.infrastructure.auth.auth_manager import AuthManager
+from app.application.services.auth.auth_manager import AuthManager
 from app.main import app
 
 
