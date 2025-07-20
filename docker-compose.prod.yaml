@@ -73,7 +73,6 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 5
-    image: nginx:latest
     container_name: nginx
     ports:
       - "80:80"
