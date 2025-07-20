@@ -14,11 +14,10 @@ test:
     - main
 
 build:
-  before_script:
-    - sudo chown -R $(whoami):$(whoami) ./data || true
-    - chmod -R u+rwX ./data || true
+
   stage: build
   script:
+    - git clean -fdx -e data/
     - docker-compose -f docker-compose.prod.yaml build
   only:
     - main
