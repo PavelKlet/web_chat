@@ -78,7 +78,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./media:/media
+      - /srv/web_chat_media:/media
     depends_on:
       - api
     networks:
