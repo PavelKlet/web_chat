@@ -26,7 +26,7 @@ services:
       - redis
       - db
     volumes:
-      - /srv/web_chat_media:/app/media
+      - /home/gitlab-runner/builds/YU0xx7xwp/0/pavelklet-group/web_chat_data:/app/media
     networks:
       - web-net
 
@@ -55,7 +55,7 @@ services:
     ports:
       - "27018:27017"
     volumes:
-      - /srv/web_chat_data/mongo:/data/db
+      - /home/gitlab-runner/builds/YU0xx7xwp/0/pavelklet-group/web_chat_data/mongo:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
@@ -101,7 +101,7 @@ services:
       - POSTGRES_HOST=${DB_HOST}
       - POSTGRES_PORT=${DB_PORT}
     volumes:
-      - /srv/web_chat_data/db:/data/db
+      - /home/gitlab-runner/builds/YU0xx7xwp/0/pavelklet-group/web_chat_data/db:/data/db
     networks:
       - web-net
 
