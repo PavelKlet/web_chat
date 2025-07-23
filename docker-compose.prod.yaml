@@ -77,7 +77,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - /srv/web_chat_media:/media
+      - /home/gitlab-runner/builds/YU0xx7xwp/0/pavelklet-group/media_data:/media
     depends_on:
       - api
     networks:
