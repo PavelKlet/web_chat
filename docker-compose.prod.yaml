@@ -101,7 +101,7 @@ services:
       - POSTGRES_HOST=${DB_HOST}
       - POSTGRES_PORT=${DB_PORT}
     volumes:
-      - /home/gitlab-runner/builds/YU0xx7xwp/0/pavelklet-group/web_chat_data/db:/data/db
+      - /home/gitlab-runner/builds/YU0xx7xwp/0/pavelklet-group/web_chat_data/db:/var/lib/postgresql/data
     networks:
       - web-net
 
