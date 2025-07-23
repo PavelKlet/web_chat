@@ -26,7 +26,7 @@ services:
       - redis
       - db
     volumes:
-      - /home/gitlab-runner/builds/YU0xx7xwp/0/pavelklet-group/web_chat_data:/usr/src/app/media
+      - /home/gitlab-runner/builds/YU0xx7xwp/0/pavelklet-group/media_data:/usr/src/app/media
     networks:
       - web-net
 
