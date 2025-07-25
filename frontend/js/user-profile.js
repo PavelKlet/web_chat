@@ -3,17 +3,21 @@ async function CheckProtectUserId() {
   let parts = path.split("/");
   let user_id = parseInt(parts[parts.length - 2]);
 
-  let protectResponse = await fetch("/protect/profile/");
-  if (!protectResponse.ok) {
-    return;
-  }
+  let protectUserId = null;
 
-  let protectData = await protectResponse.json();
-  let protectUserId = protectData.user_id; 
+  try {
+    let protectResponse = await fetch("/protect/profile/");
+    if (protectResponse.ok) {
+      let protectData = await protectResponse.json();
+      protectUserId = protectData.user_id;
+    }
+  } catch (e) {
+    console.warn("Не удалось получить данные о текущем пользователе");
+  }
 
   let isFriendResponse = await fetch(`/friends/is-friend/${user_id}`);
   if (!isFriendResponse.ok) {
-    return;
+    console.warn("Не авторизован");
   }
 
   let { is_friend } = await isFriendResponse.json();
@@ -25,11 +29,11 @@ async function CheckProtectUserId() {
     textElement.textContent = "Пользователь уже добавлен в друзья";
     parentDiv.removeChild(addFriendLink); 
     parentDiv.appendChild(textElement); 
-  } else if (protectUserId !== user_id) {
+  } else if (protectUserId && protectUserId !== user_id) {
     addFriendLink.classList.remove("hidden");
     addFriendLink.setAttribute("data-friend-id", user_id); 
     addFriendLink.addEventListener("click", addFriend);
-  } else {
+  } else if (protectUserId === user_id) {
     window.location.href = '/profile/';
   }
 
@@ -49,6 +53,7 @@ async function CheckProtectUserId() {
   document.getElementById("first_name_value").textContent = profile.first_name || "";
   document.getElementById("last_name_value").textContent = profile.last_name || "";
 }
+
 
 async function addFriend() {
   const friend_id = this.getAttribute("data-friend-id");

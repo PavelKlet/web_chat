@@ -19,9 +19,14 @@ window.addEventListener("scroll", async () => {
 
 async function getFUserFriends(page) {
     let friendsResponse = await fetch(`/friends/?pagination=true&page=${page}`);
+
+    if (friendsResponse.status === 401) {
+        window.location.href = "/login/";
+        return;
+    }
+
     if (friendsResponse.status === 200) {
         let friendsData = await friendsResponse.json();
-
         let friendsList = document.getElementById("friends_list");
         if (page === 1) {
             friendsList.innerHTML = ""; 
