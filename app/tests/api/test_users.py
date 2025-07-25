@@ -12,9 +12,9 @@ async def test_get_profile_user(client):
     data = response.json()
 
     assert "username" in data
-    assert "first_name" in data
-    assert "last_name" in data
-    assert "avatar" in data
+    assert "first_name" in data["profile"]
+    assert "last_name" in data["profile"]
+    assert "avatar" in data["profile"]
 
 
 @pytest.mark.asyncio
