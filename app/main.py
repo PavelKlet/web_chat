@@ -47,22 +47,17 @@ async def http_exception_handler(request, exc):
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     """
-        Handles general HTTP exceptions, including 404 Not Found.
+    Handles general HTTP exceptions, including 401, 404 and others.
+    """
+    accept_header = request.headers.get("accept", "")
 
-        This custom handler distinguishes between HTML and non-HTML requests.
-        - If the client expects an HTML response (e.g., browser access), it returns a rendered 404.html template.
-        - If it's an API call (e.g., `Accept: application/json`), it returns a standard JSON error response.
+    if exc.status_code == 401:
+        if "text/html" in accept_header:
+            return RedirectResponse(url="/login/", status_code=302)
+        return JSONResponse(status_code=401, content={"detail": "Unauthorized"})
 
-        Parameters:
-            request (Request): The incoming request.
-            exc (StarletteHTTPException): The HTTP exception raised (e.g., 404, 403, etc.).
-
-        Returns:
-            Union[TemplateResponse, JSONResponse]: Either a rendered HTML page or a JSON response,
-            depending on the client's Accept header.
-        """
     if exc.status_code == 404:
-        if "text/html" in request.headers.get("accept", ""):
+        if "text/html" in accept_header:
             return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
         else:
             return JSONResponse(status_code=404, content={"detail": "Not Found"})
