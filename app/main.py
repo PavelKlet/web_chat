@@ -52,9 +52,7 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
     accept_header = request.headers.get("accept", "")
 
     if exc.status_code == 401:
-        if "text/html" in accept_header:
-            return RedirectResponse(url="/login/", status_code=302)
-        return JSONResponse(status_code=401, content={"detail": "Unauthorized"})
+        return RedirectResponse(url="/login/", status_code=302)
 
     if exc.status_code == 404:
         if "text/html" in accept_header:
