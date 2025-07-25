@@ -2,9 +2,8 @@ from typing import Optional, Dict, Any, Sequence
 
 from app.infrastructure.repositories.relational.user import UserRepository
 from app.application.unit_of_work.unit_of_work import UnitOfWork
-from app.infrastructure.models.relational.users import Profile, User
 from ..exceptions import EmailAlreadyExistsException, UsernameAlreadyExistsException
-from app.api.schemas.users import UserRead, FriendSchema, ProfileSchema, UserReadPrivate
+from app.api.schemas.users import UserRead, FriendSchema, UserReadPrivate
 
 
 class UserService:

@@ -1,9 +1,7 @@
 from typing import Sequence
 
-from sqlalchemy.orm import Mapped
-
+from app.api.schemas.chat import RoomSchema
 from app.infrastructure.models.nosql.messages import Message
-from app.infrastructure.models.relational.rooms import Room
 from app.infrastructure.repositories.nosql.messages import MessageRepositoryMongoDB
 from app.infrastructure.repositories.relational.room import RoomRepository
 from app.application.unit_of_work.unit_of_work import IUnitOfWork
@@ -31,7 +29,7 @@ class ChatService:
         """
         return await self.message_repository.get_messages_by_room_id(room_id)
 
-    async def add_message_to_room(self, room_id: int, data: dict):
+    async def add_message_to_room(self, room_id: int, data: dict) -> Message:
         """
         Adds a new message to a chat room. If the room has more than 500 messages,
         deletes the oldest message.
@@ -56,10 +54,10 @@ class ChatService:
 
         return new_message
 
-    async def get_and_create_room_by_users(self, sender: Mapped[int], recipient: int) -> Room:
+    async def get_and_create_room_by_users(self, sender: int, recipient: int) -> RoomSchema:
         """
         Retrieves a chat room that connects two users.
         """
         async with self.uow:
             room = await self.uow.room.get_and_create_room_by_users(sender, recipient)
-            return room
+            return RoomSchema.model_validate(room)

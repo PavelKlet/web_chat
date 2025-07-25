@@ -10,13 +10,13 @@ from fastapi import (
     HTTPException,
     Response,
 )
-
+from fastapi.responses import JSONResponse
 from app.application.services.auth.auth_manager import get_auth_manager, get_current_user, \
     AuthManager
 from app.api.dependencies import UserServiceDep
 from app.infrastructure.models.relational.users import User
 from app.infrastructure.config.config import templates
-from .schemas.users import UserCreate, FriendSchema, UserRead, ProfileSchema
+from .schemas.users import UserCreate, FriendSchema, UserRead
 from app.infrastructure.utils.other import filter_none_values
 from ..application.exceptions import EmailAlreadyExistsException, UsernameAlreadyExistsException
 
@@ -51,7 +51,7 @@ async def get_profile(request: Request):
     return templates.TemplateResponse("profile.html", {"request": request})
 
 
-@router.get("/update-profile/", response_model=None)
+@router.get("/update-profile/")
 async def get_update_profile(request: Request):
     """Renders the page for updating the user's profile."""
     return templates.TemplateResponse("update-profile.html",
@@ -66,7 +66,7 @@ async def update_profile(
     avatar: UploadFile = File(None),
     user: User = Depends(get_current_user)
 
-):
+) -> JSONResponse:
     """Updates the user's profile with new details."""
 
     if not user:
