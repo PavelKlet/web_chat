@@ -44,9 +44,10 @@ async function CheckProtectUserId() {
   let userProfile = await userProfileResponse.json();
   let usernameElement = document.querySelector("h1");
   usernameElement.textContent = userProfile.username;
-  document.getElementById("avatar_image").src = userProfile.avatar;
-  document.getElementById("first_name_value").textContent = userProfile.first_name;
-  document.getElementById("last_name_value").textContent = userProfile.last_name;
+  const profile = userProfile.profile || {};
+  document.getElementById("avatar_image").src = profile.avatar || "/static/images/default-avatar.png";
+  document.getElementById("first_name_value").textContent = profile.first_name || "";
+  document.getElementById("last_name_value").textContent = profile.last_name || "";
 }
 
 async function addFriend() {

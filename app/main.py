@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.exception_handlers import RequestValidationError
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.infrastructure.utils.redis_utils.redis_utils import redis_utils
 from app.infrastructure.config.config import templates
@@ -23,11 +24,50 @@ app = FastAPI(lifespan=lifespan)
 
 @app.exception_handler(RequestValidationError)
 async def http_exception_handler(request, exc):
+    """
+       Handles request validation errors raised when incoming request data (query params,
+       form fields, body, etc.) do not conform to the expected Pydantic models or type hints.
+
+       If the request comes from a browser (typically expecting HTML), this handler returns
+       a custom HTML error page using the 'error.html' Jinja2 template.
+
+       Parameters:
+           request (Request): The incoming request that triggered the validation error.
+           exc (RequestValidationError): The exception instance containing details about validation failure.
+
+       Returns:
+           TemplateResponse: A rendered HTML error page with status code 400.
+       """
     return templates.TemplateResponse(
         "error.html",
         {"request": request},
         status_code=400
     )
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """
+        Handles general HTTP exceptions, including 404 Not Found.
+
+        This custom handler distinguishes between HTML and non-HTML requests.
+        - If the client expects an HTML response (e.g., browser access), it returns a rendered 404.html template.
+        - If it's an API call (e.g., `Accept: application/json`), it returns a standard JSON error response.
+
+        Parameters:
+            request (Request): The incoming request.
+            exc (StarletteHTTPException): The HTTP exception raised (e.g., 404, 403, etc.).
+
+        Returns:
+            Union[TemplateResponse, JSONResponse]: Either a rendered HTML page or a JSON response,
+            depending on the client's Accept header.
+        """
+    if exc.status_code == 404:
+        if "text/html" in request.headers.get("accept", ""):
+            return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+        else:
+            return JSONResponse(status_code=404, content={"detail": "Not Found"})
+
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 @app.get("/")
 async def redirect_to_profile():

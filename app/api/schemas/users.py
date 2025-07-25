@@ -2,6 +2,13 @@ from pydantic import model_validator, BaseModel, EmailStr, ConfigDict
 from typing import Optional
 import re
 
+class UserBase(BaseModel):
+    id: int
+    username: str
+    email: str
+    class Config:
+        from_attributes = True
+
 
 class UserCreate(BaseModel):
     username: str
@@ -22,25 +29,27 @@ class UserCreate(BaseModel):
         del self.confirm_password
         return self
 
+class ProfileSchema(BaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    avatar: Optional[str]
 
-class FriendData(BaseModel):
+    class Config:
+        from_attributes = True
+
+class UserRead(UserBase):
+    profile: Optional[ProfileSchema]
+
+    class Config:
+        from_attributes = True
+
+class UserReadPrivate(UserRead):
+    hashed_password: str
+
+class FriendSchema(BaseModel):
     id: int
-    avatar: Optional[str]
     username: str
-    first_name: Optional[str]
-    last_name: Optional[str]
+    profile: Optional[ProfileSchema]
 
-
-class UserProfileData(BaseModel):
-    username: str
-    first_name: Optional[str]
-    last_name: Optional[str]
-    avatar: Optional[str]
-
-
-class UserData(BaseModel):
-    first_name: Optional[str]
-    last_name: Optional[str]
-    avatar: Optional[str]
-    user_id: int
-    username: str
+    class Config:
+        from_attributes = True

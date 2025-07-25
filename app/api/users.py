@@ -16,9 +16,8 @@ from app.application.services.auth.auth_manager import get_auth_manager, get_cur
 from app.api.dependencies import UserServiceDep
 from app.infrastructure.models.relational.users import User
 from app.infrastructure.config.config import templates
-from .schemas.users import FriendData, UserProfileData, UserCreate
+from .schemas.users import UserCreate, FriendSchema, UserRead, ProfileSchema
 from app.infrastructure.utils.other import filter_none_values
-from app.api.schemas.users import UserData
 from ..application.exceptions import EmailAlreadyExistsException, UsernameAlreadyExistsException
 
 router = APIRouter()
@@ -38,26 +37,12 @@ async def get_index(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
 
-@router.get("/protect/profile/", response_model=UserData)
+@router.get("/protect/profile/", response_model=UserRead)
 async def protect_profile(
-    user_service: UserServiceDep,
-    user: User = Depends(get_current_user)
+    user: UserRead = Depends(get_current_user)
 ):
     """Retrieves the protected profile data for the authenticated user."""
-
-    user_profile = await user_service.get_user_profile(user.id)
-
-    if not user_profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
-
-    return UserData(
-        first_name=user_profile.first_name,
-        last_name=user_profile.last_name,
-        avatar=user_profile.avatar,
-        user_id=user_profile.user_id,
-        username=user.username
-    )
-
+    return user
 
 @router.get("/profile/")
 async def get_profile(request: Request):
@@ -104,27 +89,16 @@ async def update_profile(
         raise HTTPException(status_code=400, detail=f"Failed to update profile {e}")
 
 
-@router.get("/get/user-profile/{user_id}/", response_model=UserProfileData)
+@router.get("/get/user-profile/{user_id}/", response_model=UserRead)
 async def get_profile_user(
         user_id: int,
         user_service: UserServiceDep,
 ):
     """Retrieves the profile data of a user by their ID."""
-    user_profile = await user_service.get_user_profile(user_id)
-    if not user_profile:
-        raise HTTPException(status_code=404,
-                            detail="User profile not found")
-
-    user_data = await user_service.get_user_by_id(user_id)
-    if not user_data:
+    user = await user_service.get_user_with_profile(user_id)
+    if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
-    return UserProfileData(
-        username=user_data.username,
-        first_name=user_profile.first_name,
-        last_name=user_profile.last_name,
-        avatar=user_profile.avatar
-    )
+    return user
 
 
 @router.get("/user-profile/{user_id}/")
@@ -151,7 +125,7 @@ async def add_friend(
     return Response("ok")
 
 
-@router.get("/friends/", response_model=Optional[List[FriendData]])
+@router.get("/friends/", response_model=Optional[List[FriendSchema]])
 async def get_friends(
         user_service: UserServiceDep,
         page: int = 1,
@@ -164,16 +138,7 @@ async def get_friends(
     """
     friends = await user_service.get_user_friends(user.id, page, limit,
                                                   pagination)
-    return [
-        FriendData(
-            id=friend.id,
-            avatar=friend.profile.avatar if friend.profile else None,
-            username=friend.username,
-            first_name=friend.profile.first_name if friend.profile else None,
-            last_name=friend.profile.last_name if friend.profile else None
-        )
-        for friend in friends
-    ] if friends else []
+    return friends
 
 
 @router.get("/user/friends/")
@@ -229,7 +194,7 @@ async def login_user(
     """
        Logs in a user by verifying their credentials and generates a JWT token.
     """
-    user = await user_service.get_user_by_email(email)
+    user = await user_service.get_user_by_email_private(email)
 
     if not user:
         raise HTTPException(status_code=400, detail="User not found")
@@ -255,7 +220,7 @@ async def logout_user(response: Response):
     return {"message": "Logged out successfully"}
 
 
-@router.get("/search/", response_model=Optional[List[FriendData]])
+@router.get("/search/", response_model=Optional[List[FriendSchema]])
 async def search_users(
     user_service: UserServiceDep,
     query: str,
@@ -268,16 +233,7 @@ async def search_users(
     """
 
     users = await user_service.find_users_by_username(query, page, limit)
-    return [
-        FriendData(
-            id=user.id,
-            avatar=user.profile.avatar if user.profile else None,
-            username=user.username,
-            first_name=user.profile.first_name if user.profile else None,
-            last_name=user.profile.last_name if user.profile else None
-        )
-        for user in users
-    ]
+    return users
 
 
 @router.get("/friends/is-friend/{other_user_id}")

@@ -8,11 +8,11 @@ async function handleRequest() {
 
     body.classList.remove("hidden");
     let avatarImage = document.getElementById("avatar_image");
-    avatarImage.src = data.avatar;
+    avatarImage.src = data.profile.avatar;
     let firstNameValue = document.getElementById("first_name_value");
     let lastNameValue = document.getElementById("last_name_value");
-    firstNameValue.textContent = data.first_name;
-    lastNameValue.textContent = data.last_name;
+    firstNameValue.textContent = data.profile.first_name;
+    lastNameValue.textContent = data.profile.last_name;
     let usernameElement = document.querySelector(".shifting-h1");
     usernameElement.textContent = data.username;
   } 
@@ -45,7 +45,7 @@ async function getUserFriends() {
 
         let friendAvatar = document.createElement("img");
         friendAvatar.classList.add("friend-avatar");
-        friendAvatar.src = friend.avatar;
+        friendAvatar.src = friend.profile?.avatar || "/media/default/default.png";
         friendAvatar.alt = "Аватар";
         friendAvatar.width = 50;
         friendAvatar.height = 50;

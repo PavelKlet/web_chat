@@ -4,6 +4,8 @@ from app.infrastructure.repositories.relational.user import UserRepository
 from app.application.unit_of_work.unit_of_work import UnitOfWork
 from app.infrastructure.models.relational.users import Profile, User
 from ..exceptions import EmailAlreadyExistsException, UsernameAlreadyExistsException
+from app.api.schemas.users import UserRead, FriendSchema, ProfileSchema, UserReadPrivate
+
 
 class UserService:
     """
@@ -19,21 +21,21 @@ class UserService:
         self.uow = uow
         self.uow.set_repository('user', UserRepository)
 
-    async def get_user_with_profile(self, user_id: int) -> Optional[User]:
+    async def get_user_with_profile(self, user_id: int) -> Optional[UserRead]:
         """
             Retrieves a user along with their profile information.
         """
         async with self.uow:
             user = await self.uow.user.get_user_with_profile(user_id)
-            return user
+            return UserRead.model_validate(user)
 
-    async def get_user_profile(self, user_id: int) -> Optional[Profile]:
+    async def get_user_profile(self, user_id: int) -> Optional[UserRead]:
         """
             Retrieves the profile information for a specific user.
         """
         async with self.uow:
             profile = await self.uow.user.get_user_profile(user_id)
-            return profile
+            return UserRead.model_validate(profile)
 
     async def update_user_profile(self, user_id: int, update_data: Dict[str, Any]) -> None:
         """
@@ -42,37 +44,45 @@ class UserService:
         async with self.uow:
             await self.uow.user.update_user_profile(user_id, update_data)
 
-    async def get_user_by_id(self, user_id: int) -> Optional[User]:
+    async def get_user_by_id(self, user_id: int) -> Optional[UserRead]:
         """
             Retrieves a user by their ID.
         """
         async with self.uow:
             user = await self.uow.user.get_by_id(user_id)
-            return user
+            return UserRead.model_validate(user)
 
-    async def get_user_by_email(self, email: str) -> Optional[User]:
+    async def get_user_by_email(self, email: str) -> Optional[UserRead]:
         """
            Retrieves a user by their email.
        """
         async with self.uow:
             user = await self.uow.user.get_user_by_email(email)
-            return user
+            return UserRead.model_validate(user)
 
-    async def find_users_by_username(self, username_substring: str, page: int, limit: int) -> Sequence[User]:
+    async def get_user_by_email_private(self, email: str) -> Optional[UserReadPrivate]:
+        async with self.uow:
+            user = await self.uow.user.get_user_by_email(email)
+            if user:
+                return UserReadPrivate.model_validate(user)
+            return None
+
+    async def find_users_by_username(self, username_substring: str, page: int, limit: int) -> Sequence[FriendSchema]:
         """
             Finds users by a partial username.
         """
         async with self.uow:
             users = await self.uow.user.find_users_by_username(username_substring, page, limit)
-            return users
+            return [FriendSchema.model_validate(user) for user in users]
 
-    async def get_user_friends(self, user_id: int, page: int, limit: int, paginated: bool) -> Sequence[User]:
+    async def get_user_friends(self, user_id: int, page: int, limit: int, paginated: bool) -> Sequence[FriendSchema]:
         """
            Retrieves a user's friends.
        """
         async with self.uow:
             friends = await self.uow.user.user_friends(user_id, page, limit, paginated)
-            return friends
+            return [FriendSchema.model_validate(friend) for friend in friends]
+
 
     async def add_user_friend(self, friend_id: int, user_id: int) -> None:
         """

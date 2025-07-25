@@ -95,7 +95,7 @@ function appendFriendToList(listElement, friend) {
     friendContainer.classList.add("friend-container");
 
     let avatarImage = document.createElement("img");
-    avatarImage.src = friend.avatar || "/static/images/default-avatar.png";
+    avatarImage.src = (friend.profile && friend.profile.avatar) || "/static/images/default-avatar.png";
     avatarImage.alt = "Аватар";
     avatarImage.width = 50;
     avatarImage.height = 50;
