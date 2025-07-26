@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 from fastapi import HTTPException, Request, Depends
 
+from app.api.schemas.users import UserRead
 from app.infrastructure.config.config import settings
 from app.application.services.user import UserService
-from app.infrastructure.models.relational.users import User
 from app.api.dependencies import UserServiceDep
 
 
@@ -51,7 +51,7 @@ class AuthManager:
             self,
             request: Request = None,
             token: str = None,
-    ) -> User | None:
+    ) -> UserRead | None:
         """
             Retrieves the user associated with the provided access token. If the token is not provided, it checks the cookies.
         """
@@ -93,7 +93,7 @@ async def get_auth_manager(user_service: UserServiceDep) -> AuthManager:
 async def get_current_user(
     request: Request,
     auth_manager: AuthManager = Depends(get_auth_manager)
-) -> User:
+) -> UserRead:
     """
         Retrieves the currently authenticated user by extracting the access token from the request cookies.
     """

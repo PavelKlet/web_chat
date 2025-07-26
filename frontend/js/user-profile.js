@@ -9,7 +9,7 @@ async function CheckProtectUserId() {
     let protectResponse = await fetch("/protect/profile/");
     if (protectResponse.ok) {
       let protectData = await protectResponse.json();
-      protectUserId = protectData.user_id;
+      protectUserId = protectData.id;
     }
   } catch (e) {
     console.warn("Не удалось получить данные о текущем пользователе");

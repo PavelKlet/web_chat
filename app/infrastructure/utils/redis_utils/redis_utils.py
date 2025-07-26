@@ -1,6 +1,7 @@
 import json
 from typing import Any, Union
 import redis.asyncio as redis
+from typing import AsyncGenerator
 from app.infrastructure.config.config import settings
 
 
@@ -21,12 +22,33 @@ class RedisUtils:
         self.redis_port = settings.redis_port
         self.redis_url = f"redis://{self.redis_host}:{self.redis_port}"
         self._pool = redis.ConnectionPool.from_url(self.redis_url)
+        self._pubsub_client = redis.Redis.from_url(self.redis_url, decode_responses=True)
+
+    async def publish(self, channel: str, message: dict) -> None:
+        """
+        Publishes a message to the specified channel.
+        """
+        await self._pubsub_client.publish(channel, json.dumps(message))
+
+    async def subscribe(self, channel: str) -> AsyncGenerator[dict, None]:
+        """
+        It subscribes to the Redis channel and returns incoming messages asynchronously.
+        """
+        pubsub = self._pubsub_client.pubsub()
+        await pubsub.subscribe(channel)
+
+        try:
+            async for message in pubsub.listen():
+                if message["type"] == "message":
+                    yield json.loads(message["data"])
+        finally:
+            await pubsub.unsubscribe(channel)
+            await pubsub.close()
 
     async def pool_disconnect(self) -> None:
         """
             Closes the Redis connection pool.
         """
-
         await self._pool.aclose()
 
     async def get(self, key: str) -> Any:

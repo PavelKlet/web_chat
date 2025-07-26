@@ -47,12 +47,12 @@ async def websocket_endpoint(
                 "text": data,
                 "avatarUrl": user.profile.avatar
             }
-            await websocket_manager.send_message(room_connections,
-                                                 message_data,
-                                                 chat_service,
-                                                 room.id,
-                                                 user
-                                                 )
+            await websocket_manager.send_message(
+                message_data,
+                chat_service,
+                room.id,
+                user
+            )
     except WebSocketDisconnect:
         room_connections.remove(websocket)
         if len(room_connections) == 0:

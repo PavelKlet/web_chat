@@ -1,3 +1,4 @@
+import asyncio
 from typing import Tuple, List, Optional
 
 from fastapi import WebSocket, HTTPException
@@ -18,6 +19,29 @@ class WebsocketManager:
     def __init__(self, redis: RedisUtils):
         self.redis_utils = redis
         self.rooms = {}
+        self.listener_tasks: dict[int, asyncio.Task] = {}
+
+    async def start_listener(self, room_id: int) -> None:
+        """
+         Starts a message listener from Redis Pub/Sub for a specific room.
+         Sends each message to all active WebSocket's in that room.
+        """
+        async for message in self.redis_utils.subscribe(f"chat:room:{room_id}:channel"):
+            connections = self.rooms.get(room_id, {}).get("connections", [])
+
+            if not connections:
+                await self.delete_room(room_id)
+                break
+
+            for ws in connections[:]:
+                try:
+                    await ws.send_json(message)
+                except Exception:
+                    connections.remove(ws)
+
+            if not connections:
+                await self.delete_room(room_id)
+                break
 
     async def connect(
             self,
@@ -52,6 +76,9 @@ class WebsocketManager:
         room_data = self.rooms.setdefault(room_id, {"connections": []})
         room_data["connections"].append(websocket)
 
+        if room_id not in self.listener_tasks:
+            self.listener_tasks[room_id] = asyncio.create_task(self.start_listener(room_id))
+
         cached_messages = await self.redis_utils.get_messages_list(room_id)
 
         if cached_messages:
@@ -75,7 +102,6 @@ class WebsocketManager:
 
     async def send_message(
             self,
-            room_connections: List[WebSocket],
             data: dict,
             chat_service: ChatService,
             room_id: int,
@@ -91,23 +117,37 @@ class WebsocketManager:
         })
 
         avatar_url = sender.profile.avatar
-
         data["avatarUrl"] = avatar_url
 
-        for connection in room_connections:
-            await connection.send_json(data)
-
-        if await self.redis_utils.message_list_exists(room_id):
-            await self.redis_utils.add_message_to_list(room_id, {
+        await self.redis_utils.publish(
+            f"chat:room:{room_id}:channel",
+            {
                 "text": message.text,
                 "user_id": message.user_id,
                 "avatarUrl": avatar_url
-            })
+            }
+        )
+        try:
+            if await self.redis_utils.message_list_exists(room_id):
+                await self.redis_utils.add_message_to_list(room_id, {
+                    "text": message.text,
+                    "user_id": message.user_id,
+                    "avatarUrl": avatar_url
+                })
+        except Exception:
+            pass
 
-    async def delete_room(self, room_id: str) -> None:
+    async def delete_room(self, room_id: int) -> None:
         """
             Deletes a room from the active room list.
         """
+        if room_id in self.listener_tasks:
+            task = self.listener_tasks[room_id]
+            task.cancel()
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(task)
+            del self.listener_tasks[room_id]
+
         if room_id in self.rooms:
             del self.rooms[room_id]
 
