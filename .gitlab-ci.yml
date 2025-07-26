@@ -25,6 +25,7 @@ deploy:
   stage: deploy
   script:
     - cp $ENV ./.env
+    - docker-compose -f docker-compose.prod.yaml down
     - docker-compose -f docker-compose.prod.yaml up -d
   only:
     - main
