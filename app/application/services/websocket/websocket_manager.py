@@ -19,29 +19,6 @@ class WebsocketManager:
     def __init__(self, redis: RedisUtils):
         self.redis_utils = redis
         self.rooms = {}
-        self.listener_tasks: dict[int, asyncio.Task] = {}
-
-    async def start_listener(self, room_id: int) -> None:
-        """
-         Starts a message listener from Redis Pub/Sub for a specific room.
-         Sends each message to all active WebSocket's in that room.
-        """
-        async for message in self.redis_utils.subscribe(f"chat:room:{room_id}:channel"):
-            connections = self.rooms.get(room_id, {}).get("connections", [])
-
-            if not connections:
-                await self.delete_room(room_id)
-                break
-
-            for ws in connections[:]:
-                try:
-                    await ws.send_json(message)
-                except Exception:
-                    connections.remove(ws)
-
-            if not connections:
-                await self.delete_room(room_id)
-                break
 
     async def connect(
             self,
@@ -76,9 +53,6 @@ class WebsocketManager:
         room_data = self.rooms.setdefault(room_id, {"connections": []})
         room_data["connections"].append(websocket)
 
-        if room_id not in self.listener_tasks:
-            self.listener_tasks[room_id] = asyncio.create_task(self.start_listener(room_id))
-
         cached_messages = await self.redis_utils.get_messages_list(room_id)
 
         if cached_messages:
@@ -86,7 +60,7 @@ class WebsocketManager:
         else:
             messages = await chat_service.get_messages_for_room(room_id)
             message_list = [
-                {
+                {   "username": message.username,
                     "text": message.text,
                     "user_id": message.user_id,
                     "avatarUrl": user.profile.avatar if message.user_id == user.id else recipient.profile.avatar
@@ -110,6 +84,7 @@ class WebsocketManager:
             and broadcasts the data to all connected WebSocket clients.
         """
         message = await chat_service.add_message_to_room(room_id, {
+            "username": data["username"],
             "text": data["text"],
             "user_id": sender.id
         })
@@ -120,6 +95,7 @@ class WebsocketManager:
         await self.redis_utils.publish(
             f"chat:room:{room_id}:channel",
             {
+                "username": message.username,
                 "text": message.text,
                 "user_id": message.user_id,
                 "avatarUrl": avatar_url
@@ -128,6 +104,7 @@ class WebsocketManager:
         try:
             if await self.redis_utils.message_list_exists(room_id):
                 await self.redis_utils.add_message_to_list(room_id, {
+                    "username": message.username,
                     "text": message.text,
                     "user_id": message.user_id,
                     "avatarUrl": avatar_url
@@ -139,15 +116,6 @@ class WebsocketManager:
         """
             Deletes a room from the active room list and cancel pub/sub task.
         """
-        if room_id in self.listener_tasks:
-            task = self.listener_tasks[room_id]
-            task.cancel()
-            try:
-                await task
-            except asyncio.CancelledError:
-                pass
-
-        del self.listener_tasks[room_id]
 
         if room_id in self.rooms:
             del self.rooms[room_id]

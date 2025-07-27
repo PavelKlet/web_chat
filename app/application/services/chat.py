@@ -36,11 +36,13 @@ class ChatService:
         """
         message_text = data.get("text")
         user_id = data.get("user_id")
+        username = data.get("username")
 
         new_message_data = {
             "room_id": room_id,
             "text": message_text,
-            "user_id": user_id
+            "user_id": user_id,
+            "username": username
         }
 
         new_message = await self.message_repository.add_one(new_message_data)

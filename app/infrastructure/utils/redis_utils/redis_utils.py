@@ -30,19 +30,30 @@ class RedisUtils:
         """
         await self._pubsub_client.publish(channel, json.dumps(message))
 
-    async def subscribe(self, channel: str) -> AsyncGenerator[dict, None]:
+    async def psubscribe(self, pattern: str) -> AsyncGenerator[tuple[int, dict], None]:
         """
-        It subscribes to the Redis channel and returns incoming messages asynchronously.
+        Subscribes to all Redis channels matching the pattern and yields (room_id, message) pairs.
         """
         pubsub = self._pubsub_client.pubsub()
-        await pubsub.subscribe(channel)
+        await pubsub.psubscribe(pattern)
 
         try:
             async for message in pubsub.listen():
-                if message["type"] == "message":
-                    yield json.loads(message["data"])
+                if message["type"] != "pmessage":
+                    continue
+
+                channel = message["channel"]
+                if isinstance(channel, bytes):
+                    channel = channel.decode()
+
+                try:
+                    room_id = int(channel.split(":")[2])
+                    payload = json.loads(message["data"])
+                    yield room_id, payload
+                except Exception:
+                    continue
         finally:
-            await pubsub.unsubscribe(channel)
+            await pubsub.punsubscribe(pattern)
             await pubsub.close()
 
     async def pool_disconnect(self) -> None:

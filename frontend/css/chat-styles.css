@@ -17,7 +17,15 @@
     display: flex;
     justify-content: space-between;
 }
-  
+
+.message-text {
+  white-space: pre-wrap;
+}
+
+#messageInput {
+  font-size: 17px !important;
+}
+
 #messageInput {
     width: 50px; 
     flex-grow: 1;

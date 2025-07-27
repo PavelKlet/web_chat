@@ -41,10 +41,9 @@ async def websocket_endpoint(
             if not raw_text.strip():
                 continue
 
-            data = f"{user.username}: {raw_text}"
-            data = data[:1024]
             message_data = {
-                "text": data,
+                "username": user.username,
+                "text": raw_text[:1024],
                 "avatarUrl": user.profile.avatar
             }
             await websocket_manager.send_message(

@@ -7,6 +7,7 @@ class Message(Document):
     user_id: int = Field(..., description="ID пользователя")
     text: str = Field(..., max_length=1024, description="Текст сообщения")
     created_at: datetime = Field(default_factory=datetime.now, description="Дата создания")
+    username: str = Field(..., max_length=250, description="Никнейм пользователя")
 
     class Settings:
         name = "messages"

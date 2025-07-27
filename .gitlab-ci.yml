@@ -16,7 +16,6 @@ test:
 build:
   stage: build
   script:
-    - git clean -fdx -e data/
     - docker-compose -f docker-compose.prod.yaml build
   only:
     - main

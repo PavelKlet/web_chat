@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -9,15 +10,33 @@ from app.infrastructure.utils.redis_utils.redis_utils import redis_utils
 from app.infrastructure.config.config import templates
 from .api.chat import router as chat_router
 from .api.users import router as user_router
+from .application.services.websocket.websocket_manager import websocket_manager
 from .infrastructure.config.database import init_mongo, mongo_db
+from .infrastructure.utils.tasks import start_listener_with_restart
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_mongo()
+
+    listener_task = asyncio.create_task(
+        start_listener_with_restart(
+            redis_utils=redis_utils,
+            rooms=websocket_manager.rooms,
+            delete_room_callback=websocket_manager.delete_room
+        )
+    )
+
     yield
+
     await redis_utils.pool_disconnect()
     mongo_db.client.close()
+
+    listener_task.cancel()
+    try:
+        await listener_task
+    except asyncio.CancelledError:
+        pass
 
 
 app = FastAPI(lifespan=lifespan)

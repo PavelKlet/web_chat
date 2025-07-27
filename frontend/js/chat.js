@@ -42,7 +42,27 @@ async function initializeWebSocket() {
     let messagesContainer = document.getElementById('messagesContainer');
     let sendMessageForm = document.getElementById('sendMessageForm');
     let messageInput = document.getElementById('messageInput');
-    
+
+   messageInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      if (event.shiftKey) {
+        // Shift+Enter → вставка переноса строки
+        event.preventDefault();
+
+        const start = messageInput.selectionStart;
+        const end = messageInput.selectionEnd;
+        const value = messageInput.value;
+
+        messageInput.value = value.slice(0, start) + '\n' + value.slice(end);
+        messageInput.selectionStart = messageInput.selectionEnd = start + 1;
+      } else {
+        // Enter → отправка формы
+        event.preventDefault();
+        sendMessageForm.requestSubmit();
+      }
+    }
+  });
+
     socket.onopen = () => {
       console.log('WebSocket connection established');
       socket.send(jwtToken); 
@@ -50,21 +70,22 @@ async function initializeWebSocket() {
 
     
     socket.onmessage = (event) => {
-      let messageData = JSON.parse(event.data);
+    let messageData = JSON.parse(event.data);
     
-      if (Array.isArray(messageData)) {
-        messageData.forEach((msg) => {
-          if (msg && msg.text && msg.text.trim() !== "") {
-            addMessageToContainer(msg.text, msg.avatarUrl);
-          }
-        });
-      } 
-      else if (messageData && messageData.text && messageData.text.trim() !== "") {
-        addMessageToContainer(messageData.text, messageData.avatarUrl);
-      } else {
-        console.warn("Неизвестный формат сообщения:", messageData);
-      }
-    };
+
+    if (Array.isArray(messageData)) {
+      messageData.forEach((msg) => {
+        if (msg && msg.text && msg.text.trim() !== "") {
+          addMessageToContainer(msg.username, msg.text, msg.avatarUrl);
+        }
+      });
+    } else if (messageData && messageData.text && messageData.text.trim() !== "") {
+      addMessageToContainer(messageData.username, messageData.text, messageData.avatarUrl);
+    } else {
+      console.warn("Неизвестный формат сообщения:", messageData);
+    }
+};
+
 
     socket.onerror = (error) => {
       console.error('WebSocket error:', error);
@@ -79,7 +100,7 @@ async function initializeWebSocket() {
       }
     };
     
-    function addMessageToContainer(messageText, avatarUrl) {
+    function addMessageToContainer(username, messageText, avatarUrl) {
       let messageElement = document.createElement('div');
       messageElement.classList.add('message');
       messageElement.style.marginBottom = '10px';
@@ -91,6 +112,12 @@ async function initializeWebSocket() {
       avatarElement.style.height = '50px';
       avatarElement.style.borderRadius = '50%';
       messageElement.appendChild(avatarElement);
+
+      let usernameElement = document.createElement('div');
+      usernameElement.classList.add('username');
+      usernameElement.textContent = username;
+      usernameElement.style.fontWeight = 'bold';
+      messageElement.appendChild(usernameElement);
     
       let messageTextElement = document.createElement('div');
       messageTextElement.classList.add('message-text');
