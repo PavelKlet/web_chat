@@ -142,9 +142,12 @@ class WebsocketManager:
         if room_id in self.listener_tasks:
             task = self.listener_tasks[room_id]
             task.cancel()
-            async with asyncio.TaskGroup() as tg:
-                tg.create_task(task)
-            del self.listener_tasks[room_id]
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+        del self.listener_tasks[room_id]
 
         if room_id in self.rooms:
             del self.rooms[room_id]
