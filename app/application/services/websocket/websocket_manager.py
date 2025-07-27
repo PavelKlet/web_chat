@@ -53,8 +53,8 @@ class WebsocketManager:
     ) -> Optional[Tuple[List[WebSocket], Room, User, User]]:
 
         """
-            Establishes a WebSocket connection, authenticates the user via token,
-            finds or creates a chat room, and sends the message history from Redis or the database.
+            Establishes a WebSocket connection, authenticates the user with a token,
+            finds or creates a chat room, and sends the message history from Redis or a database using Redis pub/sub.
         """
 
         await websocket.accept()
@@ -83,9 +83,7 @@ class WebsocketManager:
 
         if cached_messages:
             await websocket.send_json(list(reversed(cached_messages)))
-            print("CACHED")
         else:
-            print("NOT CACHED")
             messages = await chat_service.get_messages_for_room(room_id)
             message_list = [
                 {
@@ -139,7 +137,7 @@ class WebsocketManager:
 
     async def delete_room(self, room_id: int) -> None:
         """
-            Deletes a room from the active room list.
+            Deletes a room from the active room list and cancel pub/sub task.
         """
         if room_id in self.listener_tasks:
             task = self.listener_tasks[room_id]

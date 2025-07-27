@@ -147,6 +147,7 @@ class UserRepository(SQLAlchemyRepository):
             new_profile = Profile(avatar="/media/default/default.png")
             new_user.profile = new_profile
             self.session.add(new_user)
+            await self.session.commit()
             # send_registration_email.delay(user_data["email"])
 
         except Exception as e:

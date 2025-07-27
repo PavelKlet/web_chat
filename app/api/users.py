@@ -129,7 +129,7 @@ async def add_friend(
 async def get_friends(
         user_service: UserServiceDep,
         page: int = 1,
-        limit: int = 10,
+        limit: int = 5,
         user: User = Depends(get_current_user),
         pagination: bool = False,
 ):

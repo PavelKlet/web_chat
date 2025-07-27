@@ -3,31 +3,26 @@ let currentSearchPage = 1;
 let isSearching = false;
 let hasMoreFriends = true;
 let hasMoreSearchResults = true;
-let currentSearchQuery = ""; 
-let isLoading = false;
+let currentSearchQuery = "";
 
-window.addEventListener("scroll", async () => {
-  if (window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 100) {
-    if (isLoading) return;
+let scrollTimeout = null;
 
-    isLoading = true;
-
-    if (isSearching && hasMoreSearchResults) {
-      currentSearchPage += 1;
-      const result = await searchFriendsPaginated(currentSearchPage, currentSearchQuery);
-      if (!result || result.length === 0) {
-        hasMoreSearchResults = false;
-      }
-    } else if (!isSearching && hasMoreFriends) {
-      currentFriendsPage += 1;
-      const result = await getFUserFriends(currentFriendsPage);
-      if (!result || result.length === 0) {
-        hasMoreFriends = false;
-      }
+window.addEventListener("scroll", () => {
+    if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
     }
 
-    isLoading = false;
-  }
+    scrollTimeout = setTimeout(async () => {
+        if (window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 100) {
+            if (isSearching && hasMoreSearchResults) {
+                currentSearchPage += 1;
+                await searchFriendsPaginated(currentSearchPage, currentSearchQuery);
+            } else if (!isSearching && hasMoreFriends) {
+                currentFriendsPage += 1;
+                await getFUserFriends(currentFriendsPage);
+            }
+        }
+    }, 200); 
 });
 
 async function getFUserFriends(page) {
