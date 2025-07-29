@@ -75,7 +75,8 @@ async def websocket_endpoint(
                 user
             )
     except WebSocketDisconnect:
-        room_connections.remove(websocket)
+        if websocket:
+            room_connections.remove(websocket)
         if len(room_connections) == 0:
             await websocket_manager.delete_room(room.id)
 
