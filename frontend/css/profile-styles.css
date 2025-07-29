@@ -161,3 +161,13 @@ header {
   white-space: nowrap;
 }
 
+.edit-profile-link {
+  color: #007bff; 
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.edit-profile-link:hover {
+  color: #004085;
+  cursor: pointer;
+}

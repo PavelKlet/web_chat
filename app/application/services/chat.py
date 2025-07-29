@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Sequence, List
 
-from app.api.schemas.chat import RoomSchema, ChatListItemSchema
+from app.api.schemas.chat import RoomSchema, ChatItemSchema
 from app.api.schemas.users import UserRead, FriendSchema
 from app.infrastructure.models.nosql.messages import Message
 from app.infrastructure.repositories.nosql.messages import MessageRepositoryMongoDB
@@ -78,7 +78,7 @@ class ChatService:
             user_id: int,
             rooms: list[tuple[int, int, int]],
             recipients: list[UserRead]
-    ) -> List[ChatListItemSchema]:
+    ) -> List[ChatItemSchema]:
 
         recipients_map = {u.id: u for u in recipients}
         room_ids = [r[0] for r in rooms]
@@ -93,7 +93,7 @@ class ChatService:
             if not msg:
                 continue
 
-            chat_list.append(ChatListItemSchema(
+            chat_list.append(ChatItemSchema(
                 room_id=room_id,
                 recipient=FriendSchema.model_validate(recipient),
                 last_message=msg.text if msg else None,

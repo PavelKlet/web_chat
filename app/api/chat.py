@@ -8,7 +8,7 @@ from app.application.services.auth.auth_manager import AuthManager, get_auth_man
 from app.infrastructure.config.config import templates
 from .dependencies import ChatServiceDep, UserServiceDep
 from app.application.services.websocket.websocket_manager import websocket_manager
-from .schemas.chat import ChatListItemSchema
+from .schemas.chat import ChatItemSchema
 from .schemas.users import UserRead
 
 router = APIRouter()
@@ -106,7 +106,7 @@ def get_access_token_cookie(request: Request):
 
     raise HTTPException(status_code=401, detail="Access token not found")
 
-@router.get("/api/chats", response_model=List[ChatListItemSchema])
+@router.get("/api/chats", response_model=List[ChatItemSchema])
 async def get_user_chats(
     chat_service: ChatServiceDep,
     user_service: UserServiceDep,

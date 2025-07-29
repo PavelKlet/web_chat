@@ -15,7 +15,7 @@ class RoomSchema(BaseModel):
     class Config:
         from_attributes = True
 
-class ChatListItemSchema(BaseModel):
+class ChatItemSchema(BaseModel):
     room_id: int
     recipient: FriendSchema
     last_message: Optional[str]

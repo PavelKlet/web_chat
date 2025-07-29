@@ -2,7 +2,8 @@ from typing import Tuple, List, Optional
 
 from fastapi import WebSocket, HTTPException
 
-from app.api.schemas.users import UserRead
+from app.api.schemas.chat import ChatItemSchema
+from app.api.schemas.users import UserRead, FriendSchema
 from app.application.services.auth.auth_manager import AuthManager
 from app.infrastructure.models.relational.rooms import Room
 from app.application.services.chat import ChatService
@@ -129,7 +130,7 @@ class WebsocketManager:
             data: dict,
             chat_service: ChatService,
             room_id: int,
-            sender: UserRead
+            sender: UserRead,
     ) -> None:
         """
             Sends a message to all users in the room, adds the message to Redis,
@@ -151,12 +152,13 @@ class WebsocketManager:
             "type": "chat_message"
         }
 
-        update_event = {
-            "room_id": room_id,
-            "last_message": message.text,
-            "sender_id": sender.id,
-            "type": "chat_update"
-        }
+        chat_list_item = ChatItemSchema(
+                room_id=room_id,
+                recipient=FriendSchema.model_validate(sender),
+                last_message=message.text,
+                last_message_time=message.created_at
+            ).model_dump(mode="json")
+        chat_list_item["type"] = "chat_update"
 
         await self.redis_utils.publish(
             f"chat:room:{room_id}:channel",
@@ -164,7 +166,7 @@ class WebsocketManager:
         )
         await self.redis_utils.publish(
             f"chat:room:{room_id}:channel",
-            update_event
+            chat_list_item
         )
 
         del message_data["type"]
