@@ -1,14 +1,36 @@
+from typing import List
+
 from fastapi import WebSocket, Request, APIRouter, Depends
 from fastapi.exception_handlers import HTTPException
 from fastapi.websockets import WebSocketDisconnect
 
-from app.application.services.auth.auth_manager import AuthManager, get_auth_manager
+from app.application.services.auth.auth_manager import AuthManager, get_auth_manager, get_current_user
 from app.infrastructure.config.config import templates
 from .dependencies import ChatServiceDep, UserServiceDep
 from app.application.services.websocket.websocket_manager import websocket_manager
+from .schemas.chat import ChatListItemSchema
+from .schemas.users import UserRead
 
 router = APIRouter()
 
+@router.websocket("/ws/chat-list")
+async def websocket_chat_list(
+    websocket: WebSocket,
+    auth_manager: AuthManager = Depends(get_auth_manager)
+):
+    """
+    WebSocket for updated chat list (new messages, latest messages update).
+    """
+    user = await websocket_manager.connect_chat_list(websocket, auth_manager)
+    if not user:
+        return
+
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        if websocket in websocket_manager.chat_listeners:
+            websocket_manager.chat_listeners.remove(websocket)
 
 @router.websocket("/ws/{user_id_recipient}")
 async def websocket_endpoint(
@@ -58,6 +80,7 @@ async def websocket_endpoint(
             await websocket_manager.delete_room(room.id)
 
 
+
 @router.get("/get/chat/")
 async def get_chat(
         request: Request,
@@ -82,3 +105,31 @@ def get_access_token_cookie(request: Request):
         return token
 
     raise HTTPException(status_code=401, detail="Access token not found")
+
+@router.get("/api/chats", response_model=List[ChatListItemSchema])
+async def get_user_chats(
+    chat_service: ChatServiceDep,
+    user_service: UserServiceDep,
+    user: UserRead = Depends(get_current_user),
+):
+    """Gets a list of recent messages from chats"""
+    rooms = await chat_service.get_user_room_ids(user.id)
+
+    if not rooms:
+        return []
+
+    recipient_ids = [
+        recipient_id if sender_id == user.id else sender_id
+        for room_id, sender_id, recipient_id in rooms
+    ]
+
+    recipients = await user_service.get_users_with_profiles(recipient_ids)
+    chat_list = await chat_service.get_user_chat_list(user.id, rooms, recipients)
+
+    return chat_list
+
+@router.get("/chats/")
+async def get_index(request: Request):
+    """Renders the chats."""
+
+    return templates.TemplateResponse("chats.html", {"request": request})

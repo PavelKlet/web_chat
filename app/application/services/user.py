@@ -121,3 +121,9 @@ class UserService:
         async with self.uow:
             count = await self.uow.user.get_user_friends_count(user_id)
             return count
+
+    async def get_users_with_profiles(self, user_ids: list[int]) -> list[UserRead]:
+        async with self.uow:
+            users = await self.uow.user.get_users_with_profiles(user_ids)
+            return [UserRead.model_validate(user) for user in users]
+

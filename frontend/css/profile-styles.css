@@ -46,6 +46,14 @@ body {
   left: 2px;
 }
 
+.edit-link-wrapper {
+  margin-bottom: 15px;
+}
+
+.edit-link-wrapper:last-child {
+  margin-bottom: 0;
+}
+
 .edit-profile-link {
   position: relative;
   bottom: 0px;

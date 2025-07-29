@@ -43,10 +43,18 @@ async function initializeWebSocket() {
     let sendMessageForm = document.getElementById('sendMessageForm');
     let messageInput = document.getElementById('messageInput');
 
+  
+    document.addEventListener('keydown', (event) => {
+    if (document.activeElement !== messageInput 
+        && !event.ctrlKey && !event.altKey && !event.metaKey) {
+      messageInput.focus();
+    }
+  });
+
+
    messageInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       if (event.shiftKey) {
-        // Shift+Enter → вставка переноса строки
         event.preventDefault();
 
         const start = messageInput.selectionStart;
@@ -56,7 +64,6 @@ async function initializeWebSocket() {
         messageInput.value = value.slice(0, start) + '\n' + value.slice(end);
         messageInput.selectionStart = messageInput.selectionEnd = start + 1;
       } else {
-        // Enter → отправка формы
         event.preventDefault();
         sendMessageForm.requestSubmit();
       }
@@ -145,5 +152,14 @@ async function initializeWebSocket() {
   }
 }
 }
+
+const textarea = document.getElementById("messageInput");
+
+textarea.addEventListener("input", () => {
+  textarea.style.height = "auto"; 
+  const prevScroll = window.scrollY; 
+  textarea.style.height = textarea.scrollHeight + "px"; 
+  window.scrollTo(0, prevScroll);
+});
 
 initializeWebSocket();

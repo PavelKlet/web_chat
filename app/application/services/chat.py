@@ -1,6 +1,8 @@
-from typing import Sequence
+from datetime import datetime
+from typing import Sequence, List
 
-from app.api.schemas.chat import RoomSchema
+from app.api.schemas.chat import RoomSchema, ChatListItemSchema
+from app.api.schemas.users import UserRead, FriendSchema
 from app.infrastructure.models.nosql.messages import Message
 from app.infrastructure.repositories.nosql.messages import MessageRepositoryMongoDB
 from app.infrastructure.repositories.relational.room import RoomRepository
@@ -63,3 +65,44 @@ class ChatService:
         async with self.uow:
             room = await self.uow.room.get_and_create_room_by_users(sender, recipient)
             return RoomSchema.model_validate(room)
+
+    async def get_user_room_ids(self, user_id: int) -> list[tuple[int, int, int]]:
+        """
+        Returns a list of rooms in the format (room_id, sender_id, recipient_id).
+        """
+        async with self.uow:
+            return await self.uow.room.get_user_room_ids(user_id)
+
+    async def get_user_chat_list(
+            self,
+            user_id: int,
+            rooms: list[tuple[int, int, int]],
+            recipients: list[UserRead]
+    ) -> List[ChatListItemSchema]:
+
+        recipients_map = {u.id: u for u in recipients}
+        room_ids = [r[0] for r in rooms]
+        last_messages = await self.message_repository.get_last_messages_for_rooms(room_ids)
+
+        chat_list = []
+        for room_id, sender_id, recipient_id in rooms:
+            recipient_id = recipient_id if sender_id == user_id else sender_id
+            recipient = recipients_map.get(recipient_id)
+            msg = last_messages.get(room_id)
+
+            if not msg:
+                continue
+
+            chat_list.append(ChatListItemSchema(
+                room_id=room_id,
+                recipient=FriendSchema.model_validate(recipient),
+                last_message=msg.text if msg else None,
+                last_message_time=msg.created_at if msg else None,
+            ))
+
+        chat_list.sort(key=lambda chat: chat.last_message_time or datetime.min, reverse=True)
+
+        return chat_list
+
+
+

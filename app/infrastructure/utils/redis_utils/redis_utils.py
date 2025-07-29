@@ -24,6 +24,29 @@ class RedisUtils:
         self._pool = redis.ConnectionPool.from_url(self.redis_url)
         self._pubsub_client = redis.Redis.from_url(self.redis_url, decode_responses=True)
 
+    async def subscribe(self, channel: str, timeout: int = 25) -> dict | None:
+        """
+            Subscribes to a Redis channel and waits for one message (or a timeout).
+            Returns dict payload or None if there were no messages.
+        """
+        pubsub = self._pubsub_client.pubsub()
+        await pubsub.subscribe(channel)
+
+        try:
+            message = await pubsub.get_message(
+                ignore_subscribe_messages=True,
+                timeout=timeout
+            )
+            if message and message["type"] == "message":
+                try:
+                    return json.loads(message["data"])
+                except Exception:
+                    return None
+            return None
+        finally:
+            await pubsub.unsubscribe(channel)
+            await pubsub.close()
+
     async def publish(self, channel: str, message: dict) -> None:
         """
         Publishes a message to the specified channel.

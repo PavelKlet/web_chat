@@ -39,3 +39,14 @@ class RoomRepository(SQLAlchemyRepository):
             return new_room
 
         return room
+
+    async def get_user_room_ids(self, user_id: int) -> list[tuple[int, int, int]]:
+        """
+            Returns a list of user numbers: (room_id, sender_id, recipient).
+        """
+        stmt = (
+            select(Room.id, Room.sender_id, Room.recipient_id)
+            .filter((Room.sender_id == user_id) | (Room.recipient_id == user_id))
+        )
+        result = await self.session.execute(stmt)
+        return result.all()

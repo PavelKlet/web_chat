@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Личные сообщения</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/chats.css">
+</head>
+<body>
+  <header>
+    <div class="chat-wrapper">
+      <a href="/profile/" class="web-chat">WebChat</a>
+    </div>
+    <script src="/static/js/logout.js"></script>
+    <a onclick="logout()" class="logout-button">Выйти</a>
+  </header>
+
+    <div class="chats-wrapper">
+        <h1 class="shifting-h1">Чаты</h1>
+        <ul class="chat-list" id="chatList"></ul>
+    </div>
+
+  <script src="/static/js/chats.js"></script>
+</body>
+</html>

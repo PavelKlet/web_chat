@@ -1,13 +1,12 @@
-import asyncio
 from typing import Tuple, List, Optional
 
 from fastapi import WebSocket, HTTPException
 
+from app.api.schemas.users import UserRead
 from app.application.services.auth.auth_manager import AuthManager
 from app.infrastructure.models.relational.rooms import Room
 from app.application.services.chat import ChatService
 from app.application.services.user import UserService
-from app.infrastructure.models.relational.users import User
 from app.infrastructure.utils.redis_utils.redis_utils import RedisUtils, redis_utils
 
 class WebsocketManager:
@@ -18,7 +17,57 @@ class WebsocketManager:
 
     def __init__(self, redis: RedisUtils):
         self.redis_utils = redis
-        self.rooms = {}
+        self.rooms: dict[int, dict[str, list[WebSocket]]] = {}
+        self.chat_listeners: list[WebSocket] = []
+
+    async def connect_chat_list(
+            self,
+            websocket: WebSocket,
+            auth_manager: AuthManager
+    ):
+        """Connecting to the chat list page."""
+        await websocket.accept()
+
+        try:
+            access_token = await websocket.receive_text()
+            user = await auth_manager.get_user(token=access_token)
+        except HTTPException:
+            await websocket.close(code=1008)
+            return
+
+        self.chat_listeners.append(websocket)
+        return user
+
+    async def broadcast_to_room(self, room_id: int, payload: dict):
+        """Sending a message to everyone in the room"""
+        connections = self.rooms.get(room_id, {}).get("connections", [])
+        if not connections:
+            await self.delete_room(room_id)
+            return
+
+        dead = []
+        for ws in connections:
+            try:
+                await ws.send_json(payload)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            connections.remove(ws)
+
+        if not connections:
+            await self.delete_room(room_id)
+
+    async def broadcast_chat_update(self, payload: dict):
+        """Sending chat list updates"""
+        dead = []
+        for ws in self.chat_listeners:
+            try:
+                await ws.send_json(payload)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            self.chat_listeners.remove(ws)
+
 
     async def connect(
             self,
@@ -27,7 +76,7 @@ class WebsocketManager:
             chat_service: ChatService,
             user_service: UserService,
             auth_manager: AuthManager
-    ) -> Optional[Tuple[List[WebSocket], Room, User, User]]:
+    ) -> Optional[Tuple[List[WebSocket], Room, UserRead, UserRead]]:
 
         """
             Establishes a WebSocket connection, authenticates the user with a token,
@@ -53,7 +102,10 @@ class WebsocketManager:
         room_data = self.rooms.setdefault(room_id, {"connections": []})
         room_data["connections"].append(websocket)
 
-        cached_messages = await self.redis_utils.get_messages_list(room_id)
+        try:
+            cached_messages = await self.redis_utils.get_messages_list(room_id)
+        except Exception:
+            cached_messages = None
 
         if cached_messages:
             await websocket.send_json(list(reversed(cached_messages)))
@@ -77,7 +129,7 @@ class WebsocketManager:
             data: dict,
             chat_service: ChatService,
             room_id: int,
-            sender: User
+            sender: UserRead
     ) -> None:
         """
             Sends a message to all users in the room, adds the message to Redis,
@@ -90,25 +142,35 @@ class WebsocketManager:
         })
 
         avatar_url = sender.profile.avatar
-        data["avatarUrl"] = avatar_url
+
+        message_data = {
+            "username": message.username,
+            "text": message.text,
+            "user_id": message.user_id,
+            "avatarUrl": avatar_url,
+            "type": "chat_message"
+        }
+
+        update_event = {
+            "room_id": room_id,
+            "last_message": message.text,
+            "sender_id": sender.id,
+            "type": "chat_update"
+        }
 
         await self.redis_utils.publish(
             f"chat:room:{room_id}:channel",
-            {
-                "username": message.username,
-                "text": message.text,
-                "user_id": message.user_id,
-                "avatarUrl": avatar_url
-            }
+            message_data
         )
+        await self.redis_utils.publish(
+            f"chat:room:{room_id}:channel",
+            update_event
+        )
+
+        del message_data["type"]
         try:
             if await self.redis_utils.message_list_exists(room_id):
-                await self.redis_utils.add_message_to_list(room_id, {
-                    "username": message.username,
-                    "text": message.text,
-                    "user_id": message.user_id,
-                    "avatarUrl": avatar_url
-                })
+                await self.redis_utils.add_message_to_list(room_id, message_data)
         except Exception:
             pass
 

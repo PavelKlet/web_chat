@@ -20,3 +20,20 @@ class MessageRepositoryMongoDB(BaseMongoRepository):
         oldest_message = await self.get_oldest_message(room_id)
         if oldest_message:
             await oldest_message.delete()
+
+    async def get_last_messages_for_rooms(self, room_ids: list[int]) -> dict[int, Message]:
+        pipeline = [
+            {"$match": {"room_id": {"$in": room_ids}}},
+            {"$sort": {"created_at": -1}},
+            {"$group": {
+                "_id": "$room_id",
+                "doc": {"$first": "$$ROOT"}
+            }},
+        ]
+        cursor = self.model.get_motor_collection().aggregate(pipeline)
+        results = await cursor.to_list(length=len(room_ids))
+
+        return {
+            r["_id"]: self.model.model_validate(r["doc"])
+            for r in results
+        }

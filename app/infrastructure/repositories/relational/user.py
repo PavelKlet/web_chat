@@ -50,6 +50,21 @@ class UserRepository(SQLAlchemyRepository):
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
+    async def get_users_with_profiles(self, user_ids: list[int]) -> list[User]:
+        """
+            Gets a list of users with their profiles by ID.
+        """
+        if not user_ids:
+            return []
+
+        stmt = (
+            select(User)
+            .where(User.id.in_(user_ids))
+            .options(selectinload(User.profile))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
     async def update_user_profile(self, user_id: int, update_data: Dict[str, Any]) -> None:
         """
             Updates the profile of a user with the provided data.
